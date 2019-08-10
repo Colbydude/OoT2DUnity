@@ -935,6 +935,36 @@ PrefabInstance:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: -2695619058785784247, guid: 3e1616bd91747544bbed3922cbbb0379,
     type: 3}
+--- !u!60 &232080228
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 4294798806519030387, guid: 3e1616bd91747544bbed3922cbbb0379,
+    type: 3}
+  m_PrefabInstance: {fileID: 20088353}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: 95.958374, y: -127.91625}
+      - {x: -0.041666623, y: -127.91625}
+      - {x: 0, y: -0}
+      - {x: 95.958374, y: 0.08333337}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -1162,36 +1192,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac0b09e7857660247b1477e93731de29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!60 &964613509
-PolygonCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 4294798806519030387, guid: 3e1616bd91747544bbed3922cbbb0379,
-    type: 3}
-  m_PrefabInstance: {fileID: 20088353}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Points:
-    m_Paths:
-    - - {x: 95.958374, y: -127.91625}
-      - {x: -0.041666623, y: -127.91625}
-      - {x: 0, y: -0}
-      - {x: 95.958374, y: 0.08333337}
 --- !u!4 &1154245581 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3479741832443093032, guid: 1496c3c81921d4bc18db36c0e3d999a1,
@@ -1282,7 +1282,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_ConfineMode: 0
   m_BoundingVolume: {fileID: 0}
-  m_BoundingShape2D: {fileID: 964613509}
+  m_BoundingShape2D: {fileID: 232080228}
   m_ConfineScreenEdges: 1
   m_Damping: 0
 --- !u!1 &1485463094
