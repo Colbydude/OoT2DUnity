@@ -232,8 +232,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 3479741832443093029}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3c1b8589a580454d905dbc345536dee, type: 3}
+  m_Script: {fileID: 11500000, guid: 4e0054760c60e498c99904daf6f88407, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   direction: 270
-  speed: 8
+  moveSpeed: 12
+  rollSpeed: 24
