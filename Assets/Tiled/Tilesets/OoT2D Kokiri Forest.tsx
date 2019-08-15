@@ -1749,4 +1749,11 @@
    <object id="1" x="0" y="0" width="16" height="16"/>
   </objectgroup>
  </tile>
+ <tile id="942">
+  <animation>
+   <frame tileid="940" duration="200"/>
+   <frame tileid="941" duration="200"/>
+   <frame tileid="942" duration="200"/>
+  </animation>
+ </tile>
 </tileset>

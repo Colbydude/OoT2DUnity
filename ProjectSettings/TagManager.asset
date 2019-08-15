@@ -38,15 +38,30 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Background
-    uniqueID: 1596496779
+  - name: Map Layer -2
+    uniqueID: 2878249695
     locked: 0
-  - name: Triggers
-    uniqueID: 3494511193
+  - name: Map Layer -1
+    uniqueID: 1641178533
     locked: 0
-  - name: Foreground
-    uniqueID: 3300835065
+  - name: Map Layer 0
+    uniqueID: 2453826721
+    locked: 0
+  - name: Map Layer 1
+    uniqueID: 1394914173
     locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Map Layer 2
+    uniqueID: 1596496779
+    locked: 0
+  - name: Map Layer 3
+    uniqueID: 1823498201
+    locked: 0
+  - name: Map Layer 4
+    uniqueID: 2621019121
+    locked: 0
+  - name: UI
+    uniqueID: 2255526417
     locked: 0
