@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="1" nextlayerid="11" nextobjectid="9">
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="16" tileheight="16" infinite="1" nextlayerid="12" nextobjectid="16">
  <tileset firstgid="1" source="../Tilesets/OoT2D Kokiri Forest.tsx"/>
  <tileset firstgid="1025" source="../Tilesets/OoT2D Water.tsx"/>
- <layer id="8" name="Water" width="100" height="100">
+ <layer id="8" name="Map Layer 0" width="100" height="100">
   <properties>
    <property name="unity:SortingLayer" value="Map Layer 0"/>
   </properties>
@@ -171,6 +171,20 @@
 </chunk>
   </data>
  </layer>
+ <objectgroup id="11" name="Water">
+  <object id="10" type="Water" x="-32" y="-320">
+   <polygon points="0,0 -16,16 -16,112 176,112 160,96 160,16 144,0"/>
+  </object>
+  <object id="11" type="Water" x="-48" y="-144">
+   <polygon points="0,0 16,16 160,16 176,32 208,32 192,16 192,0"/>
+  </object>
+  <object id="14" type="Water" x="272" y="-112">
+   <polygon points="0,0 32,32 32,48 48,64 48,96 32,112 32,160 48,176 48,192 64,208 128,208 144,192 176,192 192,208 224,208 256,176 256,128 224,96 224,64 240,48 240,16 176,-48 128,-48 80,0 96,32 128,32 176,80 176,144 144,176 96,176 64,144 64,64 96,32 80,0"/>
+  </object>
+  <object id="15" type="Water" x="416" y="-224">
+   <polygon points="0,0 32,0 48,-16 32,-32 0,-32 -16,-16"/>
+  </object>
+ </objectgroup>
  <layer id="1" name="Map Layer 1" width="100" height="100">
   <properties>
    <property name="unity:SortingLayer" value="Map Layer 1"/>

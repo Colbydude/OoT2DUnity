@@ -12,12 +12,6 @@ public class PlayerController : MonoBehaviour
         Down = 270
     }
 
-    public enum State {
-        Idle,
-        Move,
-        Roll
-    }
-
     public int direction = (int) Direction.Down;
     public float moveSpeed = 12f;
     public float rollSpeed = 24f;
@@ -27,10 +21,17 @@ public class PlayerController : MonoBehaviour
     protected Vector2 m_MoveVector;
     protected bool m_Moving;
 
+    protected SpriteRenderer m_Shadow_SpriteRenderer;
+    protected Transform m_Shadow_Transform;
+
     void Awake()
     {
         m_Animator = GetComponent<Animator>();
         m_Rigidbody2D = GetComponent<Rigidbody2D>();
+
+        m_Shadow_Transform = transform.Find("Shadow");
+        m_Shadow_SpriteRenderer = m_Shadow_Transform.GetComponent<SpriteRenderer>();
+
     }
 
     void Start()
@@ -53,6 +54,21 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.layer == 4) {
+            m_Animator.Play("Swim Idle");
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.layer == 4) {
+            // collision.
+            m_Animator.Play("Idle");
+        }
+    }
+
     // Public functions - called mostly by StateMachineBehaviours.
     public void CheckForRoll()
     {
@@ -64,6 +80,16 @@ public class PlayerController : MonoBehaviour
     public Vector2 GetMoveVector()
     {
         return m_MoveVector;
+    }
+
+    public Transform GetShadowTransform()
+    {
+        return m_Shadow_Transform;
+    }
+
+    public SpriteRenderer GetShadowSpriteRenderer()
+    {
+        return m_Shadow_SpriteRenderer;
     }
 
     public void Movement()
@@ -113,13 +139,6 @@ public class PlayerController : MonoBehaviour
                 }
             break;
         }
-
-        if (m_Moving) {
-            m_Animator.Play("Walk");
-        }
-        else {
-            m_Animator.Play("Idle");
-        }
     }
 
     public void SetHorizontalMovement(float newHorizontalMovement)
@@ -139,6 +158,8 @@ public class PlayerController : MonoBehaviour
 
     public void UpdateFacing()
     {
+        m_Animator.SetBool("Moving", m_Moving);
+
         switch (direction) {
             case (int) Direction.Right: m_Animator.SetFloat("FaceX", 1); m_Animator.SetFloat("FaceY", 0);   break;
             case (int) Direction.Up:    m_Animator.SetFloat("FaceX", 0); m_Animator.SetFloat("FaceY", 1);   break;
