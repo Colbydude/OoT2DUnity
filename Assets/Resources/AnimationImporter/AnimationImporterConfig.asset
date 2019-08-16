@@ -17,7 +17,7 @@ MonoBehaviour:
   _automaticImporting: 1
   _spritePixelsPerUnit: 8
   _targetObjectType: 0
-  _spriteAlignment: 7
+  _spriteAlignment: 0
   _spriteAlignmentCustomX: 0
   _spriteAlignmentCustomY: 0
   _spritesTargetLocation:

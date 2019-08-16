@@ -57,15 +57,14 @@ public class PlayerController : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.layer == 4) {
-            m_Animator.Play("Swim Idle");
+            m_Animator.Play("Swim");
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.gameObject.layer == 4) {
-            // collision.
-            m_Animator.Play("Idle");
+            m_Animator.Play("Normal");
         }
     }
 
@@ -158,7 +157,11 @@ public class PlayerController : MonoBehaviour
 
     public void UpdateFacing()
     {
-        m_Animator.SetBool("Moving", m_Moving);
+        if (m_Moving) {
+            m_Animator.SetFloat("Moving", 1);
+        } else {
+            m_Animator.SetFloat("Moving", 0);
+        }
 
         switch (direction) {
             case (int) Direction.Right: m_Animator.SetFloat("FaceX", 1); m_Animator.SetFloat("FaceY", 0);   break;

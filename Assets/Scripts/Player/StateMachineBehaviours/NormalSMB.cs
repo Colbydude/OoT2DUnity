@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class IdleSMB : SceneLinkedSMB<PlayerController>
+public class NormalSMB : SceneLinkedSMB<PlayerController>
 {
     public override void OnSLStateNoTransitionUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
