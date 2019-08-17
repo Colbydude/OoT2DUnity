@@ -94,6 +94,7 @@ public class PlayerController : MonoBehaviour
     public void Movement()
     {
         int holdL, holdR, holdU, holdD;
+        float speed;
         m_MoveVector = Vector2.zero;
 
         // Get actual key/joystick/button presses for each direction.
@@ -113,8 +114,15 @@ public class PlayerController : MonoBehaviour
             holdD = 0;
         }
 
+        // Adjust movement speed when moving diagonally.
+        if ((holdD == 1 || holdU == 1) && (holdL == 1 || holdR == 1)) {
+            speed = (moveSpeed / Mathf.Sqrt(2));
+        } else {
+            speed = moveSpeed;
+        }
+
         // Set movement vector.
-        m_MoveVector = new Vector2((holdR - holdL) * moveSpeed, (holdU - holdD) * moveSpeed);
+        m_MoveVector = new Vector2((holdR - holdL) * speed, (holdU - holdD) * speed);
 
         // Determine if moving and set direction.
         switch (holdL + holdR + holdU + holdD) {
