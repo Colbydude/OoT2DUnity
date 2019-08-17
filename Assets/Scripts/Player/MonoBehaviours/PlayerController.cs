@@ -21,8 +21,10 @@ public class PlayerController : MonoBehaviour
     protected Vector2 m_MoveVector;
     protected bool m_Moving;
 
-    protected SpriteRenderer m_Shadow_SpriteRenderer;
     protected Transform m_Shadow_Transform;
+
+    protected Animator m_Sword_Animator;
+    protected Transform m_Sword_Transform;
 
     void Awake()
     {
@@ -30,8 +32,9 @@ public class PlayerController : MonoBehaviour
         m_Rigidbody2D = GetComponent<Rigidbody2D>();
 
         m_Shadow_Transform = transform.Find("Shadow");
-        m_Shadow_SpriteRenderer = m_Shadow_Transform.GetComponent<SpriteRenderer>();
 
+        m_Sword_Transform = transform.Find("Sword");
+        m_Sword_Animator = m_Sword_Transform.GetComponent<Animator>();
     }
 
     void Start()
@@ -80,6 +83,7 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetButtonDown("Sword")) {
             m_Animator.Play("Sword", -1, 0f);
+            m_Sword_Animator.Play("Swing", -1, 0f);
         }
     }
 
@@ -93,9 +97,9 @@ public class PlayerController : MonoBehaviour
         return m_Shadow_Transform;
     }
 
-    public SpriteRenderer GetShadowSpriteRenderer()
+    public Transform GetSwordTransform()
     {
-        return m_Shadow_SpriteRenderer;
+        return m_Sword_Transform;
     }
 
     public void Movement()
@@ -179,10 +183,22 @@ public class PlayerController : MonoBehaviour
         }
 
         switch (direction) {
-            case (int) Direction.Right: m_Animator.SetFloat("FaceX", 1); m_Animator.SetFloat("FaceY", 0);   break;
-            case (int) Direction.Up:    m_Animator.SetFloat("FaceX", 0); m_Animator.SetFloat("FaceY", 1);   break;
-            case (int) Direction.Left:  m_Animator.SetFloat("FaceX", -1); m_Animator.SetFloat("FaceY", 0);  break;
-            default:                    m_Animator.SetFloat("FaceX", 0); m_Animator.SetFloat("FaceY", -1);  break;
+            case (int) Direction.Right:
+                m_Animator.SetFloat("FaceX", 1); m_Animator.SetFloat("FaceY", 0);
+                m_Sword_Animator.SetFloat("FaceX", 1); m_Sword_Animator.SetFloat("FaceY", 0);
+            break;
+            case (int) Direction.Up:
+                m_Animator.SetFloat("FaceX", 0); m_Animator.SetFloat("FaceY", 1);
+                m_Sword_Animator.SetFloat("FaceX", 0); m_Sword_Animator.SetFloat("FaceY", 1);
+            break;
+            case (int) Direction.Left:
+                m_Animator.SetFloat("FaceX", -1); m_Animator.SetFloat("FaceY", 0);
+                m_Sword_Animator.SetFloat("FaceX", -1); m_Sword_Animator.SetFloat("FaceY", 0);
+            break;
+            default:
+                m_Animator.SetFloat("FaceX", 0); m_Animator.SetFloat("FaceY", -1);
+                m_Sword_Animator.SetFloat("FaceX", 0); m_Sword_Animator.SetFloat("FaceY", -1);
+            break;
         }
 
         // Flip if facing right.
