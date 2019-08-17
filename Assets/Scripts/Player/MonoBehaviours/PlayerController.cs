@@ -125,16 +125,16 @@ public class PlayerController : MonoBehaviour
             // Moving.
             case 1:
                 m_Moving = true;
-                direction = ((int)Direction.Left) * holdL + ((int)Direction.Up) * holdU + ((int)Direction.Down) * holdD;
+                direction = ((int) Direction.Left) * holdL + ((int) Direction.Up) * holdU + ((int) Direction.Down) * holdD;
             break;
             default:
                 m_Moving = true;
 
                 switch (direction) {
-                    case (int) Direction.Left:  if (holdR == 1) { direction = (int)Direction.Right; }   break;
-                    case (int) Direction.Right: if (holdL == 1) { direction = (int)Direction.Left; }    break;
-                    case (int) Direction.Up:    if (holdD == 1) { direction = (int)Direction.Down; }    break;
-                    default:                    if (holdU == 1) { direction = (int)Direction.Up; }      break;
+                    case (int) Direction.Left:  if (holdR == 1) { direction = (int) Direction.Right; }   break;
+                    case (int) Direction.Right: if (holdL == 1) { direction = (int) Direction.Left; }    break;
+                    case (int) Direction.Up:    if (holdD == 1) { direction = (int) Direction.Down; }    break;
+                    default:                    if (holdU == 1) { direction = (int) Direction.Up; }      break;
                 }
             break;
         }
