@@ -98,10 +98,10 @@ public class PlayerController : MonoBehaviour
         m_MoveVector = Vector2.zero;
 
         // Get actual key/joystick/button presses for each direction.
-        holdL = Input.GetAxisRaw("Horizontal") == -1 ? 1 : 0;
-        holdR = Input.GetAxisRaw("Horizontal") == 1 ? 1 : 0;
-        holdU = Input.GetAxisRaw("Vertical") == 1 ? 1 : 0;
-        holdD = Input.GetAxisRaw("Vertical") == -1 ? 1 : 0;
+        holdL = Input.GetAxis("Horizontal") <= -0.5 ? 1 : 0;
+        holdR = Input.GetAxis("Horizontal") >= 0.5 ? 1 : 0;
+        holdU = Input.GetAxis("Vertical") >= 0.5 ? 1 : 0;
+        holdD = Input.GetAxis("Vertical") <= -0.5 ? 1 : 0;
 
         // Cancel opposing keys.
         if (holdL == 1 && holdR == 1) {
