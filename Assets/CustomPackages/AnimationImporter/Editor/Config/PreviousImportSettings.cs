@@ -9,7 +9,7 @@ namespace AnimationImporter
 {
 	public class PreviousImportSettings
 	{
-		private SpriteMetaData? _previousFirstSprite = null;
+		private SpriteMetaData[] _previousSheet = null;
 
 		private bool _hasPreviousTextureImportSettings = false;
 		public bool hasPreviousTextureImportSettings
@@ -34,7 +34,7 @@ namespace AnimationImporter
 
 				if (importer.spritesheet != null && importer.spritesheet.Length > 0)
 				{
-					_previousFirstSprite = importer.spritesheet[0];
+					_previousSheet = importer.spritesheet;
 				}
 			}
 		}
@@ -47,15 +47,14 @@ namespace AnimationImporter
 			}
 
 			// apply old pivot point settings
-			// we assume every sprite should have the same pivot point
-			if (_previousFirstSprite.HasValue)
+			if (_previousSheet.Length > 0)
 			{
 				var spritesheet = importer.spritesheet; // read values
 
 				for (int i = 0; i < spritesheet.Length; i++)
 				{
-					spritesheet[i].alignment = _previousFirstSprite.Value.alignment;
-					spritesheet[i].pivot = _previousFirstSprite.Value.pivot;
+					spritesheet[i].alignment = _previousSheet[i].alignment;
+					spritesheet[i].pivot = _previousSheet[i].pivot;
 				}
 
 				importer.spritesheet = spritesheet; // write values
