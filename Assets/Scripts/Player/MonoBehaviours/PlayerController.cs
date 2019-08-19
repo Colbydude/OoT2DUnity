@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour
         SceneLinkedSMB<PlayerController>.Initialise(m_Animator, this);
     }
 
-    void Update()
+    void FixedUpdate()
     {
         Move(m_MoveVector);
     }
