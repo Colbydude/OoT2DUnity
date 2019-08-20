@@ -167,6 +167,11 @@ public class PlayerController : MonoBehaviour
     public void SetMoveVector(Vector2 newMoveVector)
     {
         m_MoveVector = newMoveVector;
+
+        if (m_MoveVector == Vector2.zero) {
+            m_Moving = false;
+            m_Animator.SetFloat("Moving", 0);
+        }
     }
 
     public void SetVerticalMovement(float newVerticalMovement)
