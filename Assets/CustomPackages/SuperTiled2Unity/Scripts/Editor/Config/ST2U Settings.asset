@@ -58,4 +58,16 @@ MonoBehaviour:
   - m_Name: Water
     m_Color: {r: 0, g: 0.33333334, b: 1, a: 1}
     m_CustomProperties: []
-  m_PrefabReplacements: []
+  m_PrefabReplacements:
+  - m_TypeName: Rock
+    m_Prefab: {fileID: 4357311583876130299, guid: 9ee829e17342cdc4d9b998dda6eddf54,
+      type: 3}
+  - m_TypeName: Grass
+    m_Prefab: {fileID: 7952212931685421177, guid: 3f9857cc282c1b14cab9b304b8bac365,
+      type: 3}
+  - m_TypeName: Shrub
+    m_Prefab: {fileID: 7639243075333962962, guid: 30efac8cfa447e843abe3feca0aa83d2,
+      type: 3}
+  - m_TypeName: Sign
+    m_Prefab: {fileID: 408026078142192916, guid: 447d7c54c23328a43ab8bbdafd933f88,
+      type: 3}

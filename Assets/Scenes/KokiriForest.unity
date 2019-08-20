@@ -162,6 +162,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Kokiri Forest
       objectReference: {fileID: 0}
+    - target: {fileID: 2259037109414378131, guid: 3e1616bd91747544bbed3922cbbb0379,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 47342689640458719, guid: 3e1616bd91747544bbed3922cbbb0379,
         type: 3}
       propertyPath: m_LocalPosition.x
