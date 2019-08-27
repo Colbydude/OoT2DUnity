@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6837886948369164721}
   - component: {fileID: 2360366044104408585}
   - component: {fileID: 3548834655641748837}
+  - component: {fileID: 4606795754079037214}
   m_Layer: 10
   m_Name: Shrub
   m_TagString: Breakable
@@ -133,3 +134,15 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: Damageable+DamageEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+--- !u!114 &4606795754079037214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7639243075333962962}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f249d55e6ef64185b6bfb072f03f77b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -72,6 +72,25 @@ public class PlayerController : MonoBehaviour
     }
 
     // Public functions - called mostly by StateMachineBehaviours.
+    public Vector2 GetDirectionVector()
+    {
+        switch (direction) {
+            case (int) Direction.Right: return new Vector2(1, 0);
+            case (int) Direction.Up:    return new Vector2(0, 1);
+            case (int) Direction.Left:  return new Vector2(-1, 0);
+            default:                    return new Vector2(0, -1);
+        }
+    }
+
+    public void CheckForPickup()
+    {
+        // Raycast to see if a "carryable" object is in front of you.
+        // Press action button to pick it up.
+        if (!m_Moving && Input.GetButtonDown("Action")) {
+            m_Animator.Play("Pickup");
+        }
+    }
+
     public void CheckForRoll()
     {
         if (m_Moving && Input.GetButtonDown("Action")) {
@@ -84,6 +103,13 @@ public class PlayerController : MonoBehaviour
         if (Input.GetButtonDown("Sword")) {
             m_Animator.Play("Sword", -1, 0f);
             m_Sword_Animator.Play("Swing", -1, 0f);
+        }
+    }
+
+    public void CheckForThrow()
+    {
+        if (Input.GetButtonDown("Action")) {
+            m_Animator.Play("Throw");
         }
     }
 

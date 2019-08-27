@@ -244,6 +244,16 @@ MonoBehaviour:
   hittableLayers:
     serializedVersion: 2
     m_Bits: 1536
+  OnDamageableHit:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Damager+DamageableEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnNonDamageableHit:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Damager+NonDamageableEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
   m_LastHit: {fileID: 0}
 --- !u!1 &3479741832443093029
 GameObject:
@@ -258,6 +268,7 @@ GameObject:
   - component: {fileID: 3479741832443093028}
   - component: {fileID: 3479741832443093034}
   - component: {fileID: 3479741832443093035}
+  - component: {fileID: 6126521076436471653}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -318,7 +329,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: -3596364897476755021, guid: 63e0c2310411f42399d92672494be7c6,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -386,3 +397,15 @@ MonoBehaviour:
   direction: 270
   moveSpeed: 12
   rollSpeed: 24
+--- !u!114 &6126521076436471653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3479741832443093029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6157a751b562423ba5a06329fec211b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

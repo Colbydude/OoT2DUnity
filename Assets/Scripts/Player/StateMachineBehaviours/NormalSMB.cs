@@ -8,5 +8,6 @@ public class NormalSMB : SceneLinkedSMB<PlayerController>
         m_MonoBehaviour.Movement();
         m_MonoBehaviour.CheckForRoll();
         m_MonoBehaviour.CheckForSword();
+        m_MonoBehaviour.CheckForPickup();
     }
 }
