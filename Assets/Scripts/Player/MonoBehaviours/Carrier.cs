@@ -2,7 +2,6 @@
 
 public class Carrier : MonoBehaviour
 {
-    public Carriable target;
     public LayerMask hittableLayers;
 
     PlayerController playerController;
@@ -15,6 +14,10 @@ public class Carrier : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (playerController.GetHeldObject() != null) {
+            return;
+        }
+
         Debug.DrawRay(
             transform.position + new Vector3(0, -1.55f, 0),
             playerController.GetDirectionVector() * 1.5f,
@@ -31,12 +34,12 @@ public class Carrier : MonoBehaviour
             Carriable carriable = foundObject.transform.GetComponent<Carriable>();
 
             if (carriable) {
-                target = carriable;
+                playerController.SetCarriableTarget(carriable);
             } else {
                 carriable = null;
             }
         } else {
-            target = null;
+            playerController.SetCarriableTarget(null);
         }
     }
 }

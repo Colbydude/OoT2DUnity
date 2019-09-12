@@ -26,6 +26,10 @@ public class PlayerController : MonoBehaviour
     protected Animator m_Sword_Animator;
     protected Transform m_Sword_Transform;
 
+    protected Transform m_Carry_Position;
+    protected Carriable m_Carriable_Target;
+    protected Carriable m_Held_Object;
+
     void Awake()
     {
         m_Animator = GetComponent<Animator>();
@@ -35,6 +39,8 @@ public class PlayerController : MonoBehaviour
 
         m_Sword_Transform = transform.Find("Sword");
         m_Sword_Animator = m_Sword_Transform.GetComponent<Animator>();
+
+        m_Carry_Position = transform.Find("CarryPosition");
     }
 
     void Start()
@@ -86,7 +92,7 @@ public class PlayerController : MonoBehaviour
     {
         // Raycast to see if a "carryable" object is in front of you.
         // Press action button to pick it up.
-        if (!m_Moving && Input.GetButtonDown("Action")) {
+        if (!m_Moving && m_Carriable_Target != null && Input.GetButtonDown("Action")) {
             m_Animator.Play("Pickup");
         }
     }
@@ -111,6 +117,21 @@ public class PlayerController : MonoBehaviour
         if (Input.GetButtonDown("Action")) {
             m_Animator.Play("Throw");
         }
+    }
+
+    public Carriable GetCarriableTarget()
+    {
+        return m_Carriable_Target;
+    }
+
+    public Transform GetCarryPosition()
+    {
+        return m_Carry_Position;
+    }
+
+    public Carriable GetHeldObject()
+    {
+        return m_Held_Object;
     }
 
     public Vector2 GetMoveVector()
@@ -183,6 +204,16 @@ public class PlayerController : MonoBehaviour
                 }
             break;
         }
+    }
+
+    public void SetCarriableTarget(Carriable carriable)
+    {
+        m_Carriable_Target = carriable;
+    }
+
+    public void SetHeldObject(Carriable carriable)
+    {
+        m_Held_Object = carriable;
     }
 
     public void SetHorizontalMovement(float newHorizontalMovement)
