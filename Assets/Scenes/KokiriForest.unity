@@ -289,7 +289,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 118174713}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.3431206, y: -43.27345, z: -175.97534}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -7224,7 +7224,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1035233082}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.3431206, y: -43.27345, z: -175.97534}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -7273,12 +7273,12 @@ PrefabInstance:
     - target: {fileID: 3479741832443093032, guid: 1496c3c81921d4bc18db36c0e3d999a1,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5.8
+      value: -27.2
       objectReference: {fileID: 0}
     - target: {fileID: 3479741832443093032, guid: 1496c3c81921d4bc18db36c0e3d999a1,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -51.2
+      value: 7.7
       objectReference: {fileID: 0}
     - target: {fileID: 3479741832443093032, guid: 1496c3c81921d4bc18db36c0e3d999a1,
         type: 3}
@@ -7340,15 +7340,15 @@ PrefabInstance:
       propertyPath: rollSpeed
       value: 24
       objectReference: {fileID: 0}
-    - target: {fileID: 5581023202961059192, guid: 1496c3c81921d4bc18db36c0e3d999a1,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6126521076436471653, guid: 1496c3c81921d4bc18db36c0e3d999a1,
         type: 3}
       propertyPath: hittableLayers.m_Bits
       value: 1024
+      objectReference: {fileID: 0}
+    - target: {fileID: 5581023202961059192, guid: 1496c3c81921d4bc18db36c0e3d999a1,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5581023202961059192, guid: 1496c3c81921d4bc18db36c0e3d999a1, type: 3}

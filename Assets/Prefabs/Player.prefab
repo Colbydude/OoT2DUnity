@@ -398,6 +398,7 @@ MonoBehaviour:
   direction: 270
   moveSpeed: 12
   rollSpeed: 24
+  throwSpeed: 36
 --- !u!114 &6126521076436471653
 MonoBehaviour:
   m_ObjectHideFlags: 0
