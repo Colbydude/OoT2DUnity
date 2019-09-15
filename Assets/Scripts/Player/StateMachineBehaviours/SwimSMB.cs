@@ -8,6 +8,11 @@ public class SwimSMB : SceneLinkedSMB<PlayerController>
     {
         shadowSpriteRenderer = m_MonoBehaviour.GetShadowTransform().GetComponent<SpriteRenderer>();
         shadowSpriteRenderer.enabled = false;
+
+        if (m_MonoBehaviour.GetHeldObject() != null) {
+            m_MonoBehaviour.GetHeldObject().Drop();
+            m_MonoBehaviour.SetHeldObject(null);
+        }
     }
 
     public override void OnSLStateNoTransitionUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)

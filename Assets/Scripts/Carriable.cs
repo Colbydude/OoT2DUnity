@@ -46,6 +46,11 @@ public class Carriable : MonoBehaviour
         m_Collider2D.enabled = false;
     }
 
+    public void Drop()
+    {
+        hasBeenThrown = true;
+    }
+
     public void EnableCollider()
     {
         m_Collider2D.enabled = true;
