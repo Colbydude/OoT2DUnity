@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     public int direction = (int) Direction.Down;
     public float moveSpeed = 12f;
     public float rollSpeed = 24f;
+    public float throwSpeed = 36f;
 
     protected Animator m_Animator;
     protected Rigidbody2D m_Rigidbody2D;
