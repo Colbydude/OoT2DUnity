@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(Collider2D))]
@@ -30,6 +31,10 @@ public class PlayerController : MonoBehaviour
     protected Transform m_Carry_Position;
     protected Carriable m_Carriable_Target;
     protected Carriable m_Held_Object;
+
+    private bool m_Input_Context;
+    [SerializeField] private Vector2 m_Input_Movement;
+    private bool m_Input_Sword;
 
     void Awake()
     {
@@ -93,21 +98,21 @@ public class PlayerController : MonoBehaviour
     {
         // Raycast to see if a "carryable" object is in front of you.
         // Press action button to pick it up.
-        if (!m_Moving && m_Carriable_Target != null && Input.GetButtonDown("Action")) {
+        if (!m_Moving && m_Carriable_Target != null && m_Input_Context) {
             m_Animator.Play("Pickup");
         }
     }
 
     public void CheckForRoll()
     {
-        if (m_Moving && Input.GetButtonDown("Action")) {
+        if (m_Moving && m_Input_Context) {
             m_Animator.Play("Roll");
         }
     }
 
     public void CheckForSword()
     {
-        if (Input.GetButtonDown("Sword")) {
+        if (m_Input_Sword) {
             m_Animator.Play("Sword", -1, 0f);
             m_Sword_Animator.Play("Swing", -1, 0f);
         }
@@ -115,7 +120,7 @@ public class PlayerController : MonoBehaviour
 
     public void CheckForThrow()
     {
-        if (Input.GetButtonDown("Action")) {
+        if (m_Input_Context) {
             m_Animator.Play("Throw");
         }
     }
@@ -157,10 +162,10 @@ public class PlayerController : MonoBehaviour
         m_MoveVector = Vector2.zero;
 
         // Get actual key/joystick/button presses for each direction.
-        holdL = Input.GetAxisRaw("Horizontal") == -1 ? 1 : 0;
-        holdR = Input.GetAxisRaw("Horizontal") == 1 ? 1 : 0;
-        holdU = Input.GetAxisRaw("Vertical") == 1 ? 1 : 0;
-        holdD = Input.GetAxisRaw("Vertical") == -1 ? 1 : 0;
+        holdL = m_Input_Movement.x == -1 ? 1 : 0;
+        holdR = m_Input_Movement.x == 1 ? 1 : 0;
+        holdU = m_Input_Movement.y == 1 ? 1 : 0;
+        holdD = m_Input_Movement.y == -1 ? 1 : 0;
 
         // Cancel opposing keys.
         if (holdL == 1 && holdR == 1) {
@@ -205,6 +210,22 @@ public class PlayerController : MonoBehaviour
                 }
             break;
         }
+    }
+
+    public void OnContext(InputAction.CallbackContext context)
+    {
+        m_Input_Context = context.performed;
+    }
+
+    public void OnMovement(InputAction.CallbackContext context)
+    {
+        m_Input_Movement = context.ReadValue<Vector2>();
+    }
+
+    public void OnSword(InputAction.CallbackContext context)
+    {
+        m_Input_Sword = context.performed;
+        Debug.Log(context.duration);
     }
 
     public void SetCarriableTarget(Carriable carriable)
