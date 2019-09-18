@@ -16,7 +16,7 @@ public class ThrowSMB : SceneLinkedSMB<PlayerController>
     {
         // Enable the heldObject's collider after Link has finished the throw animation,
         // so that Link himself doesn't get hit. Maybe a better way to do this?
-        heldObject.EnableCollider();
+        heldObject.Collider2D.enabled = true;
         m_MonoBehaviour.HeldObject = null;
     }
 }

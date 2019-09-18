@@ -7,7 +7,7 @@ public class SwimSMB : SceneLinkedSMB<PlayerController>
     public override void OnSLStatePostEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         // Hide Link's shadow while in the water.
-        shadowSpriteRenderer = m_MonoBehaviour.ShadowTransform.GetComponent<SpriteRenderer>();
+        shadowSpriteRenderer = m_MonoBehaviour.Shadow.SpriteRenderer;
         shadowSpriteRenderer.enabled = false;
 
         // If Link's holding an object, not anymore.

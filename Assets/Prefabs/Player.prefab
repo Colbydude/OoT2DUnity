@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6810099174896240578}
   - component: {fileID: 8625734338144599248}
   - component: {fileID: 5465176821532382499}
+  - component: {fileID: 5028491927210371793}
   m_Layer: 8
   m_Name: Shadow
   m_TagString: Untagged
@@ -98,6 +99,18 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: -1.55}
   m_Size: {x: 1.75, y: 0.875}
   m_Direction: 1
+--- !u!114 &5028491927210371793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1621253077625953015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 855eae530aed245faaf76ec56776b4c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2066767588176822183
 GameObject:
   m_ObjectHideFlags: 0
@@ -111,6 +124,7 @@ GameObject:
   - component: {fileID: 119830267018349623}
   - component: {fileID: 3530711088893400745}
   - component: {fileID: 1788369422206814038}
+  - component: {fileID: 5412159364475287475}
   m_Layer: 12
   m_Name: Sword
   m_TagString: Untagged
@@ -254,6 +268,18 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: Damager+NonDamageableEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+--- !u!114 &5412159364475287475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2066767588176822183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4183bd637cd52480cad8a49359557a3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3479741832443093029
 GameObject:
   m_ObjectHideFlags: 0

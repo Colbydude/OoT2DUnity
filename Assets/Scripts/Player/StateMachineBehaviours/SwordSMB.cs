@@ -7,8 +7,8 @@ public class SwordSMB : SceneLinkedSMB<PlayerController>
 
     public override void OnSLStatePostEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        swordCollider = m_MonoBehaviour.SwordTransform.GetComponent<Collider2D>();
-        swordRenderer = m_MonoBehaviour.SwordTransform.GetComponent<SpriteRenderer>();
+        swordCollider = m_MonoBehaviour.Sword.Collider2D;
+        swordRenderer = m_MonoBehaviour.Sword.SpriteRenderer;
 
         // Stop moving and swing the sword, making the sword collider active.
         m_MonoBehaviour.SetMoveVector(new Vector2(0, 0));

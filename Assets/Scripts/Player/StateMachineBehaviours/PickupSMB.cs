@@ -11,7 +11,7 @@ public class PickupSMB : SceneLinkedSMB<PlayerController>
         m_MonoBehaviour.SetMoveVector(new Vector2(0, 0));
 
         target = m_MonoBehaviour.CarriableTarget;
-        target.DisableCollider();
+        target.Collider2D.enabled = false;
 
         // Set sorting order first if Link's facing down.
         if (m_MonoBehaviour.direction == 270) {

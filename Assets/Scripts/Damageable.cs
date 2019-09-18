@@ -22,6 +22,10 @@ public class Damageable : MonoBehaviour
         currentHealth = startingHealth;
     }
 
+    /// <summary>
+    /// Have the object take damage and invoke the necessary events.
+    /// </summary>
+    /// <param name="damager">The object this object is being damaged by.</param>
     public void TakeDamage(Damager damager)
     {
         currentHealth -= damager.damage;

@@ -14,15 +14,14 @@ public class PlayerController : MonoBehaviour
     public Transform CarryPosition { get { return m_Carry_Position; } }
     public Carriable HeldObject { get { return heldObject; } set { heldObject = value; } }
     public Vector2 MoveVector { get { return moveVector; } }
-    public Transform ShadowTransform { get { return m_Shadow_Transform; } }
-    public Transform SwordTransform { get { return m_Sword_Transform; } }
+    public ShadowController Shadow { get { return m_Shadow; } }
+    public SwordController Sword { get { return m_Sword; } }
 
     protected Animator m_Animator;
     protected Transform m_Carry_Position;
     protected Rigidbody2D m_Rigidbody2D;
-    protected Transform m_Shadow_Transform;
-    protected Animator m_Sword_Animator;
-    protected Transform m_Sword_Transform;
+    protected ShadowController m_Shadow;
+    protected SwordController m_Sword;
 
     private Carriable carriableTarget;
     private Carriable heldObject;
@@ -33,13 +32,10 @@ public class PlayerController : MonoBehaviour
     {
         m_Animator = GetComponent<Animator>();
         m_Rigidbody2D = GetComponent<Rigidbody2D>();
+        m_Shadow = GetComponentInChildren<ShadowController>();
+        m_Sword = GetComponentInChildren<SwordController>();
 
-        // Children components.
         m_Carry_Position = transform.Find("CarryPosition");
-        m_Shadow_Transform = transform.Find("Shadow");
-        m_Sword_Transform = transform.Find("Sword");
-
-        m_Sword_Animator = m_Sword_Transform.GetComponent<Animator>();
     }
 
     void Start()
@@ -86,7 +82,7 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetButtonDown("Sword")) {
             m_Animator.Play("Sword", -1, 0f);
-            m_Sword_Animator.Play("Swing", -1, 0f);
+            m_Sword.Swing();
         }
     }
 
@@ -198,19 +194,19 @@ public class PlayerController : MonoBehaviour
         switch (direction) {
             case Constants.Direction.Right:
                 m_Animator.SetFloat("FaceX", 1); m_Animator.SetFloat("FaceY", 0);
-                m_Sword_Animator.SetFloat("FaceX", 1); m_Sword_Animator.SetFloat("FaceY", 0);
+                m_Sword.SetFacing(1, 0);
             break;
             case Constants.Direction.Up:
                 m_Animator.SetFloat("FaceX", 0); m_Animator.SetFloat("FaceY", 1);
-                m_Sword_Animator.SetFloat("FaceX", 0); m_Sword_Animator.SetFloat("FaceY", 1);
+                m_Sword.SetFacing(0, 1);
             break;
             case Constants.Direction.Left:
                 m_Animator.SetFloat("FaceX", -1); m_Animator.SetFloat("FaceY", 0);
-                m_Sword_Animator.SetFloat("FaceX", -1); m_Sword_Animator.SetFloat("FaceY", 0);
+                m_Sword.SetFacing(-1, 0);
             break;
             default:
                 m_Animator.SetFloat("FaceX", 0); m_Animator.SetFloat("FaceY", -1);
-                m_Sword_Animator.SetFloat("FaceX", 0); m_Sword_Animator.SetFloat("FaceY", -1);
+                m_Sword.SetFacing(0, -1);
             break;
         }
 
@@ -224,6 +220,7 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// Actually moves the player by the given change vector every FixedUpdate.
     /// </summary>
+    /// <param name="change">Vector2 to move by.</param>
     private void Move(Vector2 change)
     {
         if (change != Vector2.zero) {

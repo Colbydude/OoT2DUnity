@@ -1,7 +1,7 @@
 ﻿using Cinemachine;
 using UnityEngine;
 
-
+[RequireComponent(typeof(CinemachineVirtualCamera))]
 public class AutoCameraSetup : MonoBehaviour
 {
     public bool autoSetupCameraFollow = true;
