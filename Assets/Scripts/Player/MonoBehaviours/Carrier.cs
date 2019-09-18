@@ -1,32 +1,35 @@
 ﻿using UnityEngine;
 
+[RequireComponent(typeof(PlayerController))]
 public class Carrier : MonoBehaviour
 {
     public LayerMask hittableLayers;
 
-    PlayerController playerController;
-    RaycastHit2D foundObject;
+    protected PlayerController m_PlayerController;
+
+    private RaycastHit2D foundObject;
 
     void Awake()
     {
-        playerController = GetComponent<PlayerController>();
+        m_PlayerController = GetComponent<PlayerController>();
     }
 
     void FixedUpdate()
     {
-        if (playerController.GetHeldObject() != null) {
+        if (m_PlayerController.HeldObject != null) {
             return;
         }
 
         Debug.DrawRay(
             transform.position + new Vector3(0, -1.55f, 0),
-            playerController.GetDirectionVector() * 1.5f,
+            m_PlayerController.GetDirectionVector() * 1.5f,
             Color.red
         );
 
+        // Raycast 12px (1.5 units) in front of Link to determine if there is an object to pickup.
         foundObject = Physics2D.Raycast(
             transform.position + new Vector3(0, -1.55f, 0),
-            playerController.GetDirectionVector(),
+            m_PlayerController.GetDirectionVector(),
             1.5f, hittableLayers
         );
 
@@ -34,12 +37,12 @@ public class Carrier : MonoBehaviour
             Carriable carriable = foundObject.transform.GetComponent<Carriable>();
 
             if (carriable) {
-                playerController.SetCarriableTarget(carriable);
+                m_PlayerController.CarriableTarget = carriable;
             } else {
                 carriable = null;
             }
         } else {
-            playerController.SetCarriableTarget(null);
+            m_PlayerController.CarriableTarget = null;
         }
     }
 }

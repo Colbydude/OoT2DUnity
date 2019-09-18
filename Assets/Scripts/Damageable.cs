@@ -13,22 +13,22 @@ public class Damageable : MonoBehaviour
     public DamageEvent OnTakeDamage;
     public DamageEvent OnDie;
 
-    protected int m_CurrentHealth;
+    public int CurrentHealth { get { return currentHealth; } }
 
-    public int CurrentHealth { get { return m_CurrentHealth; } }
+    private int currentHealth;
 
     void OnEnable()
     {
-        m_CurrentHealth = startingHealth;
+        currentHealth = startingHealth;
     }
 
     public void TakeDamage(Damager damager)
     {
-        m_CurrentHealth -= damager.damage;
+        currentHealth -= damager.damage;
 
         OnTakeDamage.Invoke(damager, this);
 
-        if (m_CurrentHealth <= 0) {
+        if (currentHealth <= 0) {
             OnDie.Invoke(damager, this);
 
             if (destroyOnDeath) {

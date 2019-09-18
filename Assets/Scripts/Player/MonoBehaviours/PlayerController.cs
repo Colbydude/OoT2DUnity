@@ -5,43 +5,41 @@
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
 {
-    public enum Direction {
-        Right = 0,
-        Up = 90,
-        Left = 180,
-        Down = 270
-    }
-
-    public int direction = (int) Direction.Down;
+    public int direction = Constants.Direction.Down;
     public float moveSpeed = 12f;
     public float rollSpeed = 24f;
     public float throwSpeed = 36f;
 
+    public Carriable CarriableTarget { get { return carriableTarget; } set { carriableTarget = value; } }
+    public Transform CarryPosition { get { return m_Carry_Position; } }
+    public Carriable HeldObject { get { return heldObject; } set { heldObject = value; } }
+    public Vector2 MoveVector { get { return moveVector; } }
+    public Transform ShadowTransform { get { return m_Shadow_Transform; } }
+    public Transform SwordTransform { get { return m_Sword_Transform; } }
+
     protected Animator m_Animator;
+    protected Transform m_Carry_Position;
     protected Rigidbody2D m_Rigidbody2D;
-    protected Vector2 m_MoveVector;
-    protected bool m_Moving;
-
     protected Transform m_Shadow_Transform;
-
     protected Animator m_Sword_Animator;
     protected Transform m_Sword_Transform;
 
-    protected Transform m_Carry_Position;
-    protected Carriable m_Carriable_Target;
-    protected Carriable m_Held_Object;
+    private Carriable carriableTarget;
+    private Carriable heldObject;
+    private Vector2 moveVector;
+    private bool moving;
 
     void Awake()
     {
         m_Animator = GetComponent<Animator>();
         m_Rigidbody2D = GetComponent<Rigidbody2D>();
 
-        m_Shadow_Transform = transform.Find("Shadow");
-
-        m_Sword_Transform = transform.Find("Sword");
-        m_Sword_Animator = m_Sword_Transform.GetComponent<Animator>();
-
+        // Children components.
         m_Carry_Position = transform.Find("CarryPosition");
+        m_Shadow_Transform = transform.Find("Shadow");
+        m_Sword_Transform = transform.Find("Sword");
+
+        m_Sword_Animator = m_Sword_Transform.GetComponent<Animator>();
     }
 
     void Start()
@@ -51,56 +49,35 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        Move(m_MoveVector);
+        Move(moveVector);
     }
 
-    private void Move(Vector2 change)
+    void OnTriggerEnter2D(Collider2D collision)
     {
-        if (change != Vector2.zero)
-        {
-            m_Rigidbody2D.MovePosition(
-                m_Rigidbody2D.position + change * Time.deltaTime
-            );
-        }
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.gameObject.layer == 4) {
+        if (collision.gameObject.layer == Constants.Layers.Water) {
             m_Animator.Play("Swim");
         }
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.layer == 4) {
+        if (collision.gameObject.layer == Constants.Layers.Water) {
             m_Animator.Play("Normal");
-        }
-    }
-
-    // Public functions - called mostly by StateMachineBehaviours.
-    public Vector2 GetDirectionVector()
-    {
-        switch (direction) {
-            case (int) Direction.Right: return new Vector2(1, 0);
-            case (int) Direction.Up:    return new Vector2(0, 1);
-            case (int) Direction.Left:  return new Vector2(-1, 0);
-            default:                    return new Vector2(0, -1);
         }
     }
 
     public void CheckForPickup()
     {
-        // Raycast to see if a "carryable" object is in front of you.
+        // Raycast to see if a "carryable" object is in front of the player.
         // Press action button to pick it up.
-        if (!m_Moving && m_Carriable_Target != null && Input.GetButtonDown("Action")) {
+        if (!moving && carriableTarget != null && Input.GetButtonDown("Action")) {
             m_Animator.Play("Pickup");
         }
     }
 
     public void CheckForRoll()
     {
-        if (m_Moving && Input.GetButtonDown("Action")) {
+        if (moving && Input.GetButtonDown("Action")) {
             m_Animator.Play("Roll");
         }
     }
@@ -120,41 +97,29 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public Carriable GetCarriableTarget()
+    /// <summary>
+    /// Gets a Vector2 representation of the player's current direction.
+    /// </summary>
+    public Vector2 GetDirectionVector()
     {
-        return m_Carriable_Target;
+        switch (direction)
+        {
+            case Constants.Direction.Right: return new Vector2(1, 0);
+            case Constants.Direction.Up:    return new Vector2(0, 1);
+            case Constants.Direction.Left:  return new Vector2(-1, 0);
+            default:                        return new Vector2(0, -1);
+        }
     }
 
-    public Transform GetCarryPosition()
-    {
-        return m_Carry_Position;
-    }
-
-    public Carriable GetHeldObject()
-    {
-        return m_Held_Object;
-    }
-
-    public Vector2 GetMoveVector()
-    {
-        return m_MoveVector;
-    }
-
-    public Transform GetShadowTransform()
-    {
-        return m_Shadow_Transform;
-    }
-
-    public Transform GetSwordTransform()
-    {
-        return m_Sword_Transform;
-    }
-
+    /// <summary>
+    /// Primary movement input logic.
+    /// </summary>
     public void Movement()
     {
         int holdL, holdR, holdU, holdD;
         float speed;
-        m_MoveVector = Vector2.zero;
+
+        moveVector = Vector2.zero;
 
         // Get actual key/joystick/button presses for each direction.
         holdL = Input.GetAxisRaw("Horizontal") == -1 ? 1 : 0;
@@ -181,80 +146,65 @@ public class PlayerController : MonoBehaviour
         }
 
         // Set movement vector.
-        m_MoveVector = new Vector2((holdR - holdL) * speed, (holdU - holdD) * speed);
+        moveVector = new Vector2((holdR - holdL) * speed, (holdU - holdD) * speed);
 
         // Determine if moving and set direction.
         switch (holdL + holdR + holdU + holdD) {
             // Not moving.
             case 0:
-                m_Moving = false;
+                moving = false;
             break;
             // Moving.
             case 1:
-                m_Moving = true;
-                direction = ((int) Direction.Left) * holdL + ((int) Direction.Up) * holdU + ((int) Direction.Down) * holdD;
+                moving = true;
+                direction = (Constants.Direction.Left) * holdL +
+                            (Constants.Direction.Up) * holdU +
+                            (Constants.Direction.Down) * holdD;
             break;
             default:
-                m_Moving = true;
+                moving = true;
 
                 switch (direction) {
-                    case (int) Direction.Left:  if (holdR == 1) { direction = (int) Direction.Right; }   break;
-                    case (int) Direction.Right: if (holdL == 1) { direction = (int) Direction.Left; }    break;
-                    case (int) Direction.Up:    if (holdD == 1) { direction = (int) Direction.Down; }    break;
-                    default:                    if (holdU == 1) { direction = (int) Direction.Up; }      break;
+                    case Constants.Direction.Left:  if (holdR == 1) { direction = Constants.Direction.Right; }   break;
+                    case Constants.Direction.Right: if (holdL == 1) { direction = Constants.Direction.Left; }    break;
+                    case Constants.Direction.Up:    if (holdD == 1) { direction = Constants.Direction.Down; }    break;
+                    default:                        if (holdU == 1) { direction = Constants.Direction.Up; }      break;
                 }
             break;
         }
     }
 
-    public void SetCarriableTarget(Carriable carriable)
-    {
-        m_Carriable_Target = carriable;
-    }
-
-    public void SetHeldObject(Carriable carriable)
-    {
-        m_Held_Object = carriable;
-    }
-
-    public void SetHorizontalMovement(float newHorizontalMovement)
-    {
-        m_MoveVector.x = newHorizontalMovement;
-    }
-
+    /// <summary>
+    /// Manually set the movement vector.
+    /// </summary>
+    /// <param name="newMoveVector">The movement vector to set.</param>
     public void SetMoveVector(Vector2 newMoveVector)
     {
-        m_MoveVector = newMoveVector;
+        moveVector = newMoveVector;
 
-        if (m_MoveVector == Vector2.zero) {
-            m_Moving = false;
+        if (moveVector == Vector2.zero) {
+            moving = false;
             m_Animator.SetFloat("Moving", 0);
         }
     }
 
-    public void SetVerticalMovement(float newVerticalMovement)
-    {
-        m_MoveVector.y = newVerticalMovement;
-    }
-
+    /// <summary>
+    /// Updates the Animator's moving and facing values.
+    /// </summary>
     public void UpdateFacing()
     {
-        if (m_Moving) {
-            m_Animator.SetFloat("Moving", 1);
-        } else {
-            m_Animator.SetFloat("Moving", 0);
-        }
+        m_Animator.SetFloat("Moving", moving ? 1 : 0);
 
         switch (direction) {
-            case (int) Direction.Right:
+            case Constants.Direction.Right:
                 m_Animator.SetFloat("FaceX", 1); m_Animator.SetFloat("FaceY", 0);
                 m_Sword_Animator.SetFloat("FaceX", 1); m_Sword_Animator.SetFloat("FaceY", 0);
             break;
-            case (int) Direction.Up:
+            case Constants.Direction.Up:
                 m_Animator.SetFloat("FaceX", 0); m_Animator.SetFloat("FaceY", 1);
                 m_Sword_Animator.SetFloat("FaceX", 0); m_Sword_Animator.SetFloat("FaceY", 1);
             break;
-            case (int) Direction.Left:
+            case Constants.Direction.Left:
                 m_Animator.SetFloat("FaceX", -1); m_Animator.SetFloat("FaceY", 0);
                 m_Sword_Animator.SetFloat("FaceX", -1); m_Sword_Animator.SetFloat("FaceY", 0);
             break;
@@ -265,11 +215,21 @@ public class PlayerController : MonoBehaviour
         }
 
         // Flip if facing right.
-        if (direction == (int) Direction.Right) {
-            transform.localScale = new Vector2(-1, transform.localScale.y);
-        }
-        else {
-            transform.localScale = new Vector2(1, transform.localScale.y);
+        transform.localScale = new Vector2(
+            direction == Constants.Direction.Right ? -1 : 1,
+            transform.localScale.y
+        );
+    }
+
+    /// <summary>
+    /// Actually moves the player by the given change vector every FixedUpdate.
+    /// </summary>
+    private void Move(Vector2 change)
+    {
+        if (change != Vector2.zero) {
+            m_Rigidbody2D.MovePosition(
+                m_Rigidbody2D.position + change * Time.deltaTime
+            );
         }
     }
 }

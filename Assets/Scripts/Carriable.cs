@@ -2,9 +2,12 @@ using UnityEngine;
 
 [RequireComponent(typeof(Collider2D))]
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(SpriteRenderer))]
 public class Carriable : MonoBehaviour
 {
     public Vector2 carryOffset;
+
+    public SpriteRenderer SpriteRenderer { get { return m_SpriteRenderer; } }
 
     protected Collider2D m_Collider2D;
     protected Rigidbody2D m_Rigidbody2D;
@@ -25,8 +28,10 @@ public class Carriable : MonoBehaviour
     void FixedUpdate()
     {
         if (hasBeenThrown) {
+            // Have the object "drop" towards the ground while it's in mid-air.
             m_Rigidbody2D.position = m_Rigidbody2D.position - new Vector2(0, Mathf.Lerp(0, 1, throwOffset));
 
+            // @TODO Fix magic numbers.
             if (transform.forward.normalized.y == -1) {
                 throwOffset += 0.25f * Time.deltaTime;
             } else {
@@ -54,11 +59,6 @@ public class Carriable : MonoBehaviour
     public void EnableCollider()
     {
         m_Collider2D.enabled = true;
-    }
-
-    public SpriteRenderer GetSpriteRenderer()
-    {
-        return m_SpriteRenderer;
     }
 
     public void SetVelocity(Vector2 velocityVector, float speed)

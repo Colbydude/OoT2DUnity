@@ -1,5 +1,4 @@
-﻿
-using Cinemachine;
+﻿using Cinemachine;
 using UnityEngine;
 
 

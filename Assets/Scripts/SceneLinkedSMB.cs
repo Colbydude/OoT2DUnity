@@ -5,8 +5,8 @@ public class SceneLinkedSMB<TMonoBehaviour> : SealedSMB where TMonoBehaviour : M
 {
     protected TMonoBehaviour m_MonoBehaviour;
 
-    bool m_FirstFrameHappened;
-    bool m_LastFrameHappened;
+    private bool firstFrameHappened;
+    private bool lastFrameHappened;
 
     public static void Initialise(Animator animator, TMonoBehaviour monoBehaviour)
     {
@@ -25,7 +25,7 @@ public class SceneLinkedSMB<TMonoBehaviour> : SealedSMB where TMonoBehaviour : M
 
     public sealed override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller)
     {
-        m_FirstFrameHappened = false;
+        firstFrameHappened = false;
 
         OnSLStateEnter(animator, stateInfo, layerIndex);
         OnSLStateEnter(animator, stateInfo, layerIndex, controller);
@@ -42,20 +42,20 @@ public class SceneLinkedSMB<TMonoBehaviour> : SealedSMB where TMonoBehaviour : M
             OnSLTransitionToStateUpdate(animator, stateInfo, layerIndex, controller);
         }
 
-        if (!animator.IsInTransition(layerIndex) && m_FirstFrameHappened) {
+        if (!animator.IsInTransition(layerIndex) && firstFrameHappened) {
             OnSLStateNoTransitionUpdate(animator, stateInfo, layerIndex);
             OnSLStateNoTransitionUpdate(animator, stateInfo, layerIndex, controller);
         }
 
-        if (animator.IsInTransition(layerIndex) && !m_LastFrameHappened && m_FirstFrameHappened) {
-            m_LastFrameHappened = true;
+        if (animator.IsInTransition(layerIndex) && !lastFrameHappened && firstFrameHappened) {
+            lastFrameHappened = true;
 
             OnSLStatePreExit(animator, stateInfo, layerIndex);
             OnSLStatePreExit(animator, stateInfo, layerIndex, controller);
         }
 
-        if (!animator.IsInTransition(layerIndex) && !m_FirstFrameHappened) {
-            m_FirstFrameHappened = true;
+        if (!animator.IsInTransition(layerIndex) && !firstFrameHappened) {
+            firstFrameHappened = true;
 
             OnSLStatePostEnter(animator, stateInfo, layerIndex);
             OnSLStatePostEnter(animator, stateInfo, layerIndex, controller);
@@ -69,7 +69,7 @@ public class SceneLinkedSMB<TMonoBehaviour> : SealedSMB where TMonoBehaviour : M
 
     public sealed override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller)
     {
-        m_LastFrameHappened = false;
+        lastFrameHappened = false;
 
         OnSLStateExit(animator, stateInfo, layerIndex);
         OnSLStateExit(animator, stateInfo, layerIndex, controller);

@@ -8,13 +8,15 @@ public class ThrowSMB : SceneLinkedSMB<PlayerController>
     {
         m_MonoBehaviour.SetMoveVector(new Vector2(0, 0));
 
-        heldObject = m_MonoBehaviour.GetHeldObject();
+        heldObject = m_MonoBehaviour.HeldObject;
         heldObject.Throw(m_MonoBehaviour.direction, m_MonoBehaviour.throwSpeed);
     }
 
     public override void OnSLStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
+        // Enable the heldObject's collider after Link has finished the throw animation,
+        // so that Link himself doesn't get hit. Maybe a better way to do this?
         heldObject.EnableCollider();
-        m_MonoBehaviour.SetHeldObject(null);
+        m_MonoBehaviour.HeldObject = null;
     }
 }
