@@ -7236,7 +7236,7 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 7721724830549914578}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1138765544
+--- !u!114 &1138765541
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -7264,11 +7264,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 3479741832443093029, guid: 1496c3c81921d4bc18db36c0e3d999a1,
-        type: 3}
-      propertyPath: m_Layer
-      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 3479741832443093032, guid: 1496c3c81921d4bc18db36c0e3d999a1,
         type: 3}
@@ -7325,33 +7320,7 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3479741832443093035, guid: 1496c3c81921d4bc18db36c0e3d999a1,
-        type: 3}
-      propertyPath: speed
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 3479741832443093035, guid: 1496c3c81921d4bc18db36c0e3d999a1,
-        type: 3}
-      propertyPath: moveSpeed
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 3479741832443093035, guid: 1496c3c81921d4bc18db36c0e3d999a1,
-        type: 3}
-      propertyPath: rollSpeed
-      value: 24
-      objectReference: {fileID: 0}
-    - target: {fileID: 6126521076436471653, guid: 1496c3c81921d4bc18db36c0e3d999a1,
-        type: 3}
-      propertyPath: hittableLayers.m_Bits
-      value: 1024
-      objectReference: {fileID: 0}
-    - target: {fileID: 5581023202961059192, guid: 1496c3c81921d4bc18db36c0e3d999a1,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 5581023202961059192, guid: 1496c3c81921d4bc18db36c0e3d999a1, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1496c3c81921d4bc18db36c0e3d999a1, type: 3}
 --- !u!1001 &7721724830549914578
 PrefabInstance:
@@ -7418,36 +7387,6 @@ PrefabInstance:
     - target: {fileID: 7721724829618400741, guid: 9963e98b0b5914c1981b6703aaf81587,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7721724830726753106, guid: 9963e98b0b5914c1981b6703aaf81587,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7721724830726753106, guid: 9963e98b0b5914c1981b6703aaf81587,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7721724830726753106, guid: 9963e98b0b5914c1981b6703aaf81587,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7721724829839597696, guid: 9963e98b0b5914c1981b6703aaf81587,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7721724829839597696, guid: 9963e98b0b5914c1981b6703aaf81587,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7721724829839597696, guid: 9963e98b0b5914c1981b6703aaf81587,
-        type: 3}
-      propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

@@ -420,6 +420,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e0054760c60e498c99904daf6f88407, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  carryPosition: {fileID: 3029104289817099009}
   direction: 270
   moveSpeed: 12
   rollSpeed: 24
@@ -438,7 +439,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hittableLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1024
 --- !u!1 &8560433980742104929
 GameObject:
   m_ObjectHideFlags: 0

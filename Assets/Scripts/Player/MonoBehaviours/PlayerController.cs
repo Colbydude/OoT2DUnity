@@ -5,20 +5,20 @@
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerController : MonoBehaviour
 {
+    public Transform carryPosition;
     public int direction = Constants.Direction.Down;
     public float moveSpeed = 12f;
     public float rollSpeed = 24f;
     public float throwSpeed = 36f;
 
     public Carriable CarriableTarget { get { return carriableTarget; } set { carriableTarget = value; } }
-    public Transform CarryPosition { get { return m_Carry_Position; } }
+    public Transform CarryPosition { get { return carryPosition; } }
     public Carriable HeldObject { get { return heldObject; } set { heldObject = value; } }
     public Vector2 MoveVector { get { return moveVector; } }
     public ShadowController Shadow { get { return m_Shadow; } }
     public SwordController Sword { get { return m_Sword; } }
 
     protected Animator m_Animator;
-    protected Transform m_Carry_Position;
     protected Rigidbody2D m_Rigidbody2D;
     protected ShadowController m_Shadow;
     protected SwordController m_Sword;
@@ -34,8 +34,6 @@ public class PlayerController : MonoBehaviour
         m_Rigidbody2D = GetComponent<Rigidbody2D>();
         m_Shadow = GetComponentInChildren<ShadowController>();
         m_Sword = GetComponentInChildren<SwordController>();
-
-        m_Carry_Position = transform.Find("CarryPosition");
     }
 
     void Start()
