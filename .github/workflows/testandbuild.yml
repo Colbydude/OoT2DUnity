@@ -1,9 +1,15 @@
-name: Test and Build 🛠
-on: [push]
+name: Test and Build
+
+on:
+  pull_request: {}
+  push: { branches: [master] }
+
+env:
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
 jobs:
   testRunnerInAllModes:
-    name: Test all modes ✨
+    name: Test all modes
     runs-on: ubuntu-latest
     steps:
       # Checkout repository (required to test local actions)
@@ -26,9 +32,21 @@ jobs:
           name: Test results (all modes)
           path: ${{ steps.testRunner.outputs.artifactsPath }}
 
-  buildForWebGL:
-    name: Build for WebGL 🕸
+  build:
+    name: Build for Windows/Mac/Linux/WebGL
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        projectPath:
+          - /
+        unityVersion:
+          - 2019.2.5f1
+        targetPlatform:
+          - StandaloneWindows64
+          - StandaloneOSX
+          - StandaloneLinux64
+          - WebGL
     steps:
       # Checkout repository (required to test local actions)
       - name: Checkout repository
@@ -36,19 +54,15 @@ jobs:
 
       # Configure builder
       - name: Build project
-        id: buildStep
-        uses: webbertakken/unity-builder@v0.1
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_PROJECT_PATH: /
-          BUILD_NAME: TestBuild
-          BUILD_TARGET: WebGL
-          BUILDS_PATH: builds
-          BUILD_COMMAND: ""
+        uses: webbertakken/unity-builder@v0.5
+        with:
+          projectPath: ${{ matrix.projectPath }}
+          unityVersion: ${{ matrix.unityVersion }}
+          targetPlatform: ${{ matrix.targetPlatform }}
 
       # Upload distributables
       - name: Upload Build
         uses: actions/upload-artifact@v1
         with:
           name: Build
-          path: ${{ steps.buildStep.outputs.allBuildsPath }}
+          path: build
