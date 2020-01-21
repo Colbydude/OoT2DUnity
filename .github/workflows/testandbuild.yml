@@ -33,15 +33,12 @@ jobs:
           path: ${{ steps.testRunner.outputs.artifactsPath }}
 
   build:
-    name: Build for Windows/Mac/Linux/WebGL
+    name: Build
+    needs: testRunnerInAllModes
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        projectPath:
-          - /
-        unityVersion:
-          - 2019.2.5f1
         targetPlatform:
           - StandaloneWindows64
           - StandaloneOSX
@@ -56,8 +53,8 @@ jobs:
       - name: Build project
         uses: webbertakken/unity-builder@v0.5
         with:
-          projectPath: ${{ matrix.projectPath }}
-          unityVersion: ${{ matrix.unityVersion }}
+          projectPath: /
+          unityVersion: 2019.2.11f1
           targetPlatform: ${{ matrix.targetPlatform }}
 
       # Upload distributables
