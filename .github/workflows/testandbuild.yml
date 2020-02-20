@@ -51,10 +51,10 @@ jobs:
 
       # Configure builder
       - name: Build project
-        uses: webbertakken/unity-builder@v0.5
+        uses: webbertakken/unity-builder@v0.11
         with:
           projectPath: /
-          unityVersion: 2019.2.11f1
+          unityVersion: 2019.3.2f1
           targetPlatform: ${{ matrix.targetPlatform }}
 
       # Upload distributables
