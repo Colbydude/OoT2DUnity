@@ -75,7 +75,7 @@ jobs:
           buildsPath: builds
           buildMethod: OOT2D.Editor.BuildGame.BuildProject
       - uses: actions/upload-artifact@v1
-        if: github.event.ref != 'refs/heads/master'
+        if: github.event.ref == 'refs/heads/master'
         with:
           name: oot2d-builds
           path: builds
