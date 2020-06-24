@@ -1,65 +1,81 @@
 name: Test and Build
 
 on:
-  pull_request: {}
   push: { branches: [master] }
+  pull_request: { branches: [master] }
 
 env:
   UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
 jobs:
-  testRunnerInAllModes:
-    name: Test all modes
-    runs-on: ubuntu-latest
-    steps:
-      # Checkout repository (required to test local actions)
-      - name: Checkout repository
-        uses: actions/checkout@v1
-
-      # Configure test runner
-      - name: Run tests
-        id: testRunner
-        uses: webbertakken/unity-test-runner@v1
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_PROJECT_PATH: /
-          TEST_MODE: all
-
-      # Upload artifacts
-      - name: Expose as artifact
-        uses: actions/upload-artifact@v1
-        with:
-          name: Test results (all modes)
-          path: ${{ steps.testRunner.outputs.artifactsPath }}
-
-  build:
-    name: Build
-    needs: testRunnerInAllModes
+  testAllModes:
+    name: Test in ${{ matrix.testMode }} on version ${{ matrix.unityVersion }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
+        unityVersion:
+          - 2019.4.0f1
+        testMode:
+          - playmode
+          - editmode
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          lfs: true
+      - uses: actions/cache@v2
+        with:
+          path: Library
+          key: Library-Tests
+          restore-keys: |
+            Library-Tests
+      - uses: webbertakken/unity-test-runner@v1.6
+        id: tests
+        with:
+          unityVersion: ${{ matrix.unityVersion }}
+          testMode: ${{ matrix.testMode }}
+          artifactsPath: ${{ matrix.testMode }}-artifacts
+      - uses: actions/upload-artifact@v1
+        with:
+          name: Test results for ${{ matrix.testMode }}
+          path: ${{ steps.tests.outputs.artifactsPath }}
+  build:
+    name: Build for ${{ matrix.targetPlatform }} on version ${{ matrix.unityVersion }}
+    needs: testAllModes
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        unityVersion:
+          - 2019.4.0f1
         targetPlatform:
           - StandaloneWindows64
           - StandaloneOSX
           - StandaloneLinux64
           - WebGL
     steps:
-      # Checkout repository (required to test local actions)
-      - name: Checkout repository
-        uses: actions/checkout@v1
-
-      # Configure builder
-      - name: Build project
-        uses: webbertakken/unity-builder@v0.5
+      - uses: actions/checkout@v2
         with:
-          projectPath: /
-          unityVersion: 2019.2.11f1
+          lfs: true
+      - uses: actions/cache@v2
+        with:
+          path: Library
+          key: Library-${{ matrix.targetPlatform }}
+      - name: Free disk space
+        run: |
+          sudo swapoff -a
+          sudo rm -f /swapfile
+          sudo apt clean
+          docker rmi $(docker image ls -aq)
+          df -h
+      - uses: webbertakken/unity-builder@v1.0
+        with:
+          unityVersion: ${{ matrix.unityVersion }}
           targetPlatform: ${{ matrix.targetPlatform }}
-
-      # Upload distributables
-      - name: Upload Build
-        uses: actions/upload-artifact@v1
+          buildsPath: builds
+          buildMethod: OOT2D.Editor.BuildGame.BuildProject
+      - uses: actions/upload-artifact@v1
+        if: github.event.ref != 'refs/heads/master'
         with:
-          name: Build
-          path: build
+          name: oot2d-builds
+          path: builds
