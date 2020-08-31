@@ -20,5 +20,6 @@
         public const int Objects = 10;
         public const int Ground = 11;
         public const int PlayerWeapon = 12;
+        public const int ThrownObjects = 13;
     }
 }

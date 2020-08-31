@@ -83,4 +83,15 @@ public class Carriable : MonoBehaviour
     {
         m_Rigidbody2D.velocity = velocityVector * speed;
     }
+
+    /// <summary>
+    /// Destroys the object when it collides after being thrown.
+    /// </summary>
+    /// <param name="collision">Collision2D data about the collision that just occurred.</param>
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (hasBeenThrown) {
+            Destroy(this.gameObject);
+        }
+    }
 }
