@@ -1003,6 +1003,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: -6941931015116853643, guid: 3e1616bd91747544bbed3922cbbb0379,
+        type: 3}
+      propertyPath: m_TagString
+      value: Water
+      objectReference: {fileID: 0}
     - target: {fileID: -6911339044273489426, guid: 3e1616bd91747544bbed3922cbbb0379,
         type: 3}
       propertyPath: m_Layer
@@ -1282,6 +1287,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: -6178996359461485032, guid: 3e1616bd91747544bbed3922cbbb0379,
+        type: 3}
+      propertyPath: m_TagString
+      value: Water
       objectReference: {fileID: 0}
     - target: {fileID: -6176984381292589322, guid: 3e1616bd91747544bbed3922cbbb0379,
         type: 3}
@@ -1697,6 +1707,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: -5223133653463733611, guid: 3e1616bd91747544bbed3922cbbb0379,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -5220374112164542254, guid: 3e1616bd91747544bbed3922cbbb0379,
         type: 3}
@@ -3793,6 +3808,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 695473359499881646, guid: 3e1616bd91747544bbed3922cbbb0379,
+        type: 3}
+      propertyPath: m_TagString
+      value: Water
+      objectReference: {fileID: 0}
     - target: {fileID: 712242470450466713, guid: 3e1616bd91747544bbed3922cbbb0379,
         type: 3}
       propertyPath: m_Layer
@@ -4187,6 +4207,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 1734366548048154231, guid: 3e1616bd91747544bbed3922cbbb0379,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1735304870557853572, guid: 3e1616bd91747544bbed3922cbbb0379,
         type: 3}
@@ -5063,6 +5088,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 4042145263760941426, guid: 3e1616bd91747544bbed3922cbbb0379,
+        type: 3}
+      propertyPath: m_TagString
+      value: Water
+      objectReference: {fileID: 0}
     - target: {fileID: 4092077387249189297, guid: 3e1616bd91747544bbed3922cbbb0379,
         type: 3}
       propertyPath: m_Layer
@@ -5152,6 +5182,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4200947240095040721, guid: 3e1616bd91747544bbed3922cbbb0379,
+        type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4206306022994000178, guid: 3e1616bd91747544bbed3922cbbb0379,
         type: 3}

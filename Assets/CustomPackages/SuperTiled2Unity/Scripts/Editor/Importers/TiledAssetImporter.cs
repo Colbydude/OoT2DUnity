@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Xml;
 using System.Xml.Linq;
 using UnityEditor;
 using UnityEditor.Experimental.AssetImporters;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.Tilemaps;
 
 // All tiled assets we want imported should use this class
@@ -17,6 +12,8 @@ namespace SuperTiled2Unity.Editor
     public abstract class TiledAssetImporter : SuperImporter
     {
         [SerializeField] private float m_PixelsPerUnit = 0.0f;
+        public float PixelsPerUnit { get { return m_PixelsPerUnit; } }
+
         [SerializeField] private int m_EdgesPerEllipse = 0;
 
 #pragma warning disable 414
@@ -72,8 +69,16 @@ namespace SuperTiled2Unity.Editor
             CheckSortingLayerName(sortLayerName);
         }
 
-        public void AssignMaterial(Renderer renderer)
+        public void AssignMaterial(Renderer renderer, string match)
         {
+            // Do we have a registered material match?
+            var matchedMaterial = SuperImportContext.Settings.MaterialMatchings.FirstOrDefault(m => m.m_LayerName.Equals(match, StringComparison.OrdinalIgnoreCase));
+            if (matchedMaterial != null)
+            {
+                renderer.material = matchedMaterial.m_Material;
+                return;
+            }
+
             // Has the user chosen to override the material used for our tilemaps and sprite objects?
             if (SuperImportContext.Settings.DefaultMaterial != null)
             {
@@ -98,6 +103,14 @@ namespace SuperTiled2Unity.Editor
             }
         }
 
+        public void ApplyDefaultSettings()
+        {
+            var settings = ST2USettings.GetOrCreateST2USettings();
+            m_PixelsPerUnit = settings.PixelsPerUnit;
+            m_EdgesPerEllipse = settings.EdgesPerEllipse;
+            EditorUtility.SetDirty(this);
+        }
+
         protected override void InternalOnImportAsset()
         {
             m_RendererSorter = new RendererSorter();
@@ -114,7 +127,7 @@ namespace SuperTiled2Unity.Editor
         {
             // Do we have a 'unity:tag' property?
             CustomProperty prop;
-            if (properties.TryGetCustomProperty("unity:tag", out prop))
+            if (properties.TryGetCustomProperty(StringConstants.Unity_Tag, out prop))
             {
                 string tag = prop.m_Value;
                 CheckTagName(tag);
@@ -126,7 +139,7 @@ namespace SuperTiled2Unity.Editor
         {
             // Do we have a 'unity:layer' property?
             CustomProperty prop;
-            if (properties.TryGetCustomProperty("unity:layer", out prop))
+            if (properties.TryGetCustomProperty(StringConstants.Unity_Layer, out prop))
             {
                 string layer = prop.m_Value;
                 if (!UnityEditorInternal.InternalEditorUtility.layers.Contains(layer))

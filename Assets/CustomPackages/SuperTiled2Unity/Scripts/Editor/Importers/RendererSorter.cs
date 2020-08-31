@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -103,7 +101,7 @@ namespace SuperTiled2Unity.Editor
         {
             // The game object may have custom properties that change how we sort
             CustomProperty property;
-            if (go.TryGetCustomPropertySafe("unity:SortingLayer", out property) || go.TryGetCustomPropertySafe("unity:sortingLayerName", out property))
+            if (go.TryGetCustomPropertySafe(StringConstants.Unity_SortingLayer, out property) || go.TryGetCustomPropertySafe(StringConstants.Unity_SortingLayerName, out property))
             {
                 // Reset order on a new sorting layer
                 var name = property.GetValueAsString();
@@ -115,7 +113,7 @@ namespace SuperTiled2Unity.Editor
             }
 
             // The game object may have a custom property to hard-code the current sort order
-            if (go.TryGetCustomPropertySafe("unity:sortingOrder", out property))
+            if (go.TryGetCustomPropertySafe(StringConstants.Unity_SortingOrder, out property))
             {
                 m_CurrentSortOrder = property.GetValueAsInt();
             }

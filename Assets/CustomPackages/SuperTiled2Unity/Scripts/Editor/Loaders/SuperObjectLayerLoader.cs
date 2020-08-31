@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Xml.Linq;
 using SuperTiled2Unity.Editor.Geometry;
 using UnityEngine;
@@ -29,8 +26,6 @@ namespace SuperTiled2Unity.Editor
             get { return m_AnimationFramerate; }
             set { m_AnimationFramerate = value; }
         }
-
-        public override bool WorldPositionStays { get { return true; } }
 
         public void CreateObjects()
         {
@@ -140,19 +135,21 @@ namespace SuperTiled2Unity.Editor
             var xPoint = xObject.Element("point");
             var xText = xObject.Element("text");
 
+            bool collisions = Importer.SuperImportContext.LayerIgnoreMode != LayerIgnoreMode.Collision;
+
             if (superObject.m_TileId != 0)
             {
                 ProcessTileObject(superObject, xObject);
             }
-            else if (xPolygon != null)
+            else if (xPolygon != null && collisions)
             {
                 ProcessPolygonElement(superObject.gameObject, xPolygon);
             }
-            else if (xPolyline != null)
+            else if (xPolyline != null && collisions)
             {
                 ProcessPolylineElement(superObject.gameObject, xPolyline);
             }
-            else if (xEllipse != null)
+            else if (xEllipse != null && collisions)
             {
                 ProcessEllipseElement(superObject.gameObject, xObject);
             }
@@ -165,7 +162,7 @@ namespace SuperTiled2Unity.Editor
                 // A point is simply an empty game object out in space.
                 // We don't need to add anything else
             }
-            else
+            else if (collisions)
             {
                 // Default object is a rectangle
                 ProcessObjectRectangle(superObject.gameObject, xObject);
@@ -231,31 +228,32 @@ namespace SuperTiled2Unity.Editor
             scale.y /= tile.m_Height;
 
             var tileOffset = new Vector3(tile.m_TileOffsetX * inversePPU, -tile.m_TileOffsetY * inversePPU);
+            var pivotOffset = ObjectAlignmentToPivot.ToVector3(tile.m_Width, tile.m_Height, inversePPU, SuperMap.m_Orientation, tile.m_ObjectAlignment);
+
             var translateCenter = new Vector3(tile.m_Width * 0.5f * inversePPU, tile.m_Height * 0.5f * inversePPU);
 
             // Our root object will contain the translation, rotation, and scale of the tile object
             var goTRS = superObject.gameObject;
             goTRS.transform.localScale = scale;
 
+            // Our pivot object will contain the tileset orientation and offset
+            var goPivot = new GameObject();
+            goPivot.name = string.Format("{0} (Pivot)", superObject.m_TiledName);
+            goPivot.transform.localPosition = tileOffset + pivotOffset;
+            goTRS.AddChildWithUniqueName(goPivot);
+
             // Add another object to handle tile flipping
             // This object will center us into the tile and perform the flips through scaling
             // This object also contains the tile offset in her transform
             var goCF = new GameObject();
             goCF.name = string.Format("{0} (CF)", superObject.m_TiledName);
-            goTRS.AddChildWithUniqueName(goCF);
+            goPivot.AddChildWithUniqueName(goCF);
 
-            goCF.transform.localPosition = translateCenter + tileOffset;
+            goCF.transform.localPosition = translateCenter;
             goCF.transform.localRotation = Quaternion.Euler(0, 0, 0);
             goCF.transform.localScale = new Vector3(flip_h ? -1 : 1, flip_v ? -1 : 1, 1);
 
-            // Note: We may not want to put the tile "back into place" depending on our coordinate system
             var fromCenter = -translateCenter;
-
-            // Isometric maps referece tile objects by bottom center
-            if (SuperMap.m_Orientation == MapOrientation.Isometric)
-            {
-                fromCenter.x -= Importer.SuperImportContext.MakeScalar(tile.m_Width * 0.5f);
-            }
 
             // Add another child, putting our coordinates back into the proper place
             var goTile = new GameObject(superObject.m_TiledName);
@@ -264,23 +262,29 @@ namespace SuperTiled2Unity.Editor
             goTile.transform.localRotation = Quaternion.Euler(0, 0, 0);
             goTile.transform.localScale = Vector3.one;
 
-            // Add the renderer
-            var renderer = goTile.AddComponent<SpriteRenderer>();
-            renderer.sprite = tile.m_Sprite;
-            renderer.color = new Color(1, 1, 1, superObject.CalculateOpacity());
-            Importer.AssignMaterial(renderer);
-            Importer.AssignSpriteSorting(renderer);
-
-            // Add the animator if needed
-            if (!tile.m_AnimationSprites.IsEmpty())
+            if (Importer.SuperImportContext.LayerIgnoreMode != LayerIgnoreMode.Visual)
             {
-                var tileAnimator = goTile.AddComponent<TileObjectAnimator>();
-                tileAnimator.m_AnimationFramerate = AnimationFramerate;
-                tileAnimator.m_AnimationSprites = tile.m_AnimationSprites;
+                // Add the renderer
+                var renderer = goTile.AddComponent<SpriteRenderer>();
+                renderer.sprite = tile.m_Sprite;
+                renderer.color = new Color(1, 1, 1, superObject.CalculateOpacity());
+                Importer.AssignMaterial(renderer, m_ObjectLayer.m_TiledName);
+                Importer.AssignSpriteSorting(renderer);
+
+                // Add the animator if needed
+                if (!tile.m_AnimationSprites.IsEmpty())
+                {
+                    var tileAnimator = goTile.AddComponent<TileObjectAnimator>();
+                    tileAnimator.m_AnimationFramerate = AnimationFramerate;
+                    tileAnimator.m_AnimationSprites = tile.m_AnimationSprites;
+                }
             }
 
-            // Add any colliders that were set up on the tile in the collision editor
-            tile.AddCollidersForTileObject(goTile, Importer.SuperImportContext);
+            if (Importer.SuperImportContext.LayerIgnoreMode != LayerIgnoreMode.Collision)
+            {
+                // Add any colliders that were set up on the tile in the collision editor
+                tile.AddCollidersForTileObject(goTile, Importer.SuperImportContext);
+            }
 
             // Store a reference to our tile object
             superObject.m_SuperTile = tile;
@@ -301,7 +305,7 @@ namespace SuperTiled2Unity.Editor
             var composition = new ComposeConvexPolygons();
             var convexPolygons = composition.Compose(triangles);
 
-            PolygonUtils.AddCompositePolygonCollider(goObject, convexPolygons);
+            PolygonUtils.AddCompositePolygonCollider(goObject, convexPolygons, Importer.SuperImportContext);
         }
 
         private void ProcessPolylineElement(GameObject goObject, XElement xPolyline)
@@ -335,9 +339,9 @@ namespace SuperTiled2Unity.Editor
             if (collider != null)
             {
                 CustomProperty isTrigger;
-                if (properties.TryGetCustomProperty("unity:isTrigger", out isTrigger))
+                if (properties.TryGetCustomProperty(StringConstants.Unity_IsTrigger, out isTrigger))
                 {
-                    collider.isTrigger = isTrigger.GetValueAsBool();
+                    collider.isTrigger = Importer.SuperImportContext.GetIsTriggerOverridable(isTrigger.GetValueAsBool());
                 }
             }
 

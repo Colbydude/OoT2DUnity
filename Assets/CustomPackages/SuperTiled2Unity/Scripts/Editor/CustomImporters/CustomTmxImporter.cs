@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using SuperTiled2Unity;
-using SuperTiled2Unity.Editor;
-using UnityEngine;
-
-namespace SuperTiled2Unity.Editor
+﻿namespace SuperTiled2Unity.Editor
 {
     public class TmxAssetImportedArgs
     {
@@ -68,11 +59,11 @@ namespace MyNamespace
     }
 
     [AutoCustomTmxImporter(2)]
-    public class MyOrderedTmxImporter2 : CustomTmxImporter
+    public class MyThrowingCustomImporter : CustomTmxImporter
     {
         public override void TmxAssetImported(TmxAssetImportedArgs args)
         {
-            Debug.Log("MyOrderedTmxImporter2 importer");
+            throw new CustomImporterException("This is my custom importer exception message.");
         }
     }
 }

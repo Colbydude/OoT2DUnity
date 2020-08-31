@@ -12,6 +12,7 @@ namespace SuperTiled2Unity.Editor
     public partial class TmxAssetImporter
     {
         private CollisionBuilder m_CurrentCollisionBuilder;
+        private SuperTileLayer m_CurrentTileLayer;
 
         private struct Chunk
         {
@@ -26,7 +27,7 @@ namespace SuperTiled2Unity.Editor
             public int Height { get; set; }
         }
 
-        private GameObject ProcessTileLayer(GameObject goParent, XElement xLayer)
+        private SuperLayer ProcessTileLayer(GameObject goParent, XElement xLayer)
         {
             Assert.IsNotNull(xLayer);
             Assert.IsNotNull(goParent);
@@ -34,33 +35,41 @@ namespace SuperTiled2Unity.Editor
             // Create the game object that contains the layer and add it to the grid parent
             var layerComponent = goParent.AddSuperLayerGameObject<SuperTileLayer>(new SuperTileLayerLoader(xLayer), SuperImportContext);
 
-            // Add properties then sort the layer
             AddSuperCustomProperties(layerComponent.gameObject, xLayer.Element("properties"));
-
             RendererSorter.BeginTileLayer(layerComponent);
 
-            // Process the data for the layer
-            var xData = xLayer.Element("data");
-            if (xData != null)
+            using (SuperImportContext.BeginIsTriggerOverride(layerComponent.gameObject))
             {
-                ProcessLayerData(layerComponent.gameObject, xData);
+                // Process the data for the layer
+                var xData = xLayer.Element("data");
+                if (xData != null)
+                {
+                    ProcessLayerData(layerComponent.gameObject, xData);
+                }
             }
 
             RendererSorter.EndTileLayer(layerComponent);
 
-            return layerComponent.gameObject;
+            return layerComponent;
         }
 
         private void ProcessLayerData(GameObject goLayer, XElement xData)
         {
             Assert.IsNotNull(goLayer);
-            Assert.IsNotNull(goLayer.GetComponent<SuperTileLayer>());
             Assert.IsNotNull(xData);
+            Assert.IsNull(m_CurrentTileLayer);
+
+            m_CurrentTileLayer = goLayer.GetComponent<SuperTileLayer>();
+            Assert.IsNotNull(m_CurrentTileLayer);
 
             // Create the tilemap for the layer if needed
-            if (!m_TilesAsObjects)
+            if (!m_TilesAsObjects && SuperImportContext.LayerIgnoreMode != LayerIgnoreMode.Visual)
             {
                 GetOrAddTilemapComponent(goLayer);
+            }
+            else if (m_TilesAsObjects)
+            {
+                goLayer.AddComponent<SuperTilesAsObjectsTilemap>();
             }
 
             var chunk = new Chunk();
@@ -97,6 +106,8 @@ namespace SuperTiled2Unity.Editor
 
                 ProcessLayerDataChunk(goLayer, chunk);
             }
+
+            m_CurrentTileLayer = null;
         }
 
         private Tilemap GetOrAddTilemapComponent(GameObject go)
@@ -120,25 +131,8 @@ namespace SuperTiled2Unity.Editor
             }
 
             tilemap = go.AddComponent<Tilemap>();
-            tilemap.tileAnchor = Vector2.zero;
             tilemap.animationFrameRate = SuperImportContext.Settings.AnimationFramerate;
-
-            if (m_MapComponent.m_Orientation == MapOrientation.Hexagonal)
-            {
-                tilemap.orientation = Tilemap.Orientation.Custom;
-
-                float ox = SuperImportContext.MakeScalar(m_MapComponent.m_TileWidth) * 0.5f;
-                float oy = SuperImportContext.MakeScalar(m_MapComponent.m_TileHeight) * 0.5f;
-                tilemap.orientationMatrix = Matrix4x4.Translate(new Vector3(-ox, -oy));
-            }
-            else if (m_MapComponent.m_Orientation == MapOrientation.Isometric || m_MapComponent.m_Orientation == MapOrientation.Staggered)
-            {
-                tilemap.orientation = Tilemap.Orientation.Custom;
-
-                float ox = SuperImportContext.MakeScalar(m_MapComponent.m_TileWidth) * 0.5f;
-                tilemap.orientationMatrix = Matrix4x4.Translate(new Vector3(-ox, 0));
-            }
-
+            tilemap.tileAnchor = new Vector3(0, 0, 0);
 
             AddTilemapRendererComponent(go);
 
@@ -153,7 +147,12 @@ namespace SuperTiled2Unity.Editor
         {
             var renderer = go.AddComponent<TilemapRenderer>();
             renderer.sortOrder = MapRenderConverter.Tiled2Unity(m_MapComponent.m_RenderOrder);
-            AssignMaterial(renderer);
+
+            // This is a hack so that Unity does not falsely detect prefab instance differences.
+            // See the SuperMap.Start method where this is put to Auto to make up for this.
+            renderer.detectChunkCullingBounds = TilemapRenderer.DetectChunkCullingBounds.Manual;
+
+            AssignMaterial(renderer, m_CurrentTileLayer.m_TiledName);
             AssignTilemapSorting(renderer);
 
 #if UNITY_2018_3_OR_NEWER
@@ -289,19 +288,9 @@ namespace SuperTiled2Unity.Editor
             Vector3 translate, rotate, scale;
             tile.GetTRS(tileId.FlipFlags, m_MapComponent.m_Orientation, out translate, out rotate, out scale);
 
-            var cellPos = superMap.CellPositionToLocalPosition(pos3.x, pos3.y);
+            var cellPos = superMap.CellPositionToLocalPosition(pos3.x, pos3.y, SuperImportContext);
             translate.x += cellPos.x;
             translate.y += cellPos.y;
-
-            if (m_MapComponent.m_Orientation == MapOrientation.Isometric || m_MapComponent.m_Orientation == MapOrientation.Staggered)
-            {
-                translate.x -= SuperImportContext.MakeScalar(m_MapComponent.m_TileWidth) * 0.5f;
-            }
-            else if (m_MapComponent.m_Orientation == MapOrientation.Hexagonal)
-            {
-                translate.x -= SuperImportContext.MakeScalar(m_MapComponent.m_TileWidth) * 0.5f;
-                translate.y -= SuperImportContext.MakeScalar(m_MapComponent.m_TileHeight) * 0.5f;
-            }
 
             // Add the game object for the tile
             goTRS.transform.localPosition = translate;
@@ -312,7 +301,7 @@ namespace SuperTiled2Unity.Editor
             var renderer = goTRS.AddComponent<SpriteRenderer>();
             renderer.sprite = tile.m_Sprite;
             renderer.color = color;
-            AssignMaterial(renderer);
+            AssignMaterial(renderer, m_CurrentTileLayer.m_TiledName);
             AssignSpriteSorting(renderer);
 
             if (!tile.m_AnimationSprites.IsEmpty())
@@ -332,14 +321,20 @@ namespace SuperTiled2Unity.Editor
             // This allows us to support Tilemaps being shared by groups
             pos3.z = RendererSorter.CurrentTileZ;
 
-            // Set the tile (sprite, transform matrix, flags)
-            var tilemap = goTilemap.GetComponentInParent<Tilemap>();
-            tilemap.SetTile(pos3, tile);
-            tilemap.SetTransformMatrix(pos3, tile.GetTransformMatrix(tileId.FlipFlags, m_MapComponent.m_Orientation));
-            tilemap.SetTileFlags(pos3, TileFlags.LockAll);
+            if (SuperImportContext.LayerIgnoreMode != LayerIgnoreMode.Visual)
+            {
+                // Set the tile (sprite, transform matrix, flags)
+                var tilemap = goTilemap.GetComponentInParent<Tilemap>();
+                tilemap.SetTile(pos3, tile);
+                tilemap.SetTransformMatrix(pos3, tile.GetTransformMatrix(tileId.FlipFlags, m_MapComponent.m_Orientation));
+                tilemap.SetTileFlags(pos3, TileFlags.LockAll);
+            }
 
-            // Do we have any colliders on the tile to be gathered?
-            m_CurrentCollisionBuilder.PlaceTileColliders(m_MapComponent, tile, tileId, pos3);
+            if (SuperImportContext.LayerIgnoreMode != LayerIgnoreMode.Collision)
+            {
+                // Do we have any colliders on the tile to be gathered?
+                m_CurrentCollisionBuilder.PlaceTileColliders(m_MapComponent, tile, tileId, pos3);
+            }
         }
 
         private void ReadTileIds_Xml(XElement xElement, ref List<uint> tileIds)
@@ -363,7 +358,7 @@ namespace SuperTiled2Unity.Editor
                 if (!String.IsNullOrEmpty(line))
                 {
                     var datum = from val in line.Split(',')
-                                where !String.IsNullOrEmpty(val)
+                                where !val.IsNullOrWhiteSpace()
                                 select Convert.ToUInt32(val);
 
                     tileIds.AddRange(datum);

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace SuperTiled2Unity.Editor
 {
@@ -23,9 +21,7 @@ namespace SuperTiled2Unity.Editor
 
         public static List<Type> GetOrderedAutoImportersTypes()
         {
-            var baseType = typeof(CustomTmxImporter);
-            var importers = from t in Assembly.GetAssembly(baseType).GetTypes()
-                            where baseType.IsAssignableFrom(t)
+            var importers = from t in AppDomain.CurrentDomain.GetAllDerivedTypes<CustomTmxImporter>()
                             where !t.IsAbstract
                             from attr in GetCustomAttributes(t, typeof(AutoCustomTmxImporterAttribute))
                             let auto = attr as AutoCustomTmxImporterAttribute

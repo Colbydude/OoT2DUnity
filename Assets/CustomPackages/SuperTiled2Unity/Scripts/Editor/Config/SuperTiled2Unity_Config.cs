@@ -9,7 +9,7 @@ namespace SuperTiled2Unity.Editor
 {
     internal class SuperTiled2Unity_Config
     {
-        internal const string Version = "1.5.5";
+        internal const string Version = "1.9.3";
         internal const string DefaultSettingsFileName = "ST2U Settings.asset";
 
         public static ST2USettings CreateDefaultSettings()
@@ -28,6 +28,53 @@ namespace SuperTiled2Unity.Editor
         public static string GetVersionError()
         {
             return string.Format("SuperTiled2Unity requires Unity 2018.3 or later. You are using {0}", Application.unityVersion);
+        }
+
+        [MenuItem("Assets/SuperTiled2Unity/Export ST2U Asset...", true)]
+        private static bool ExportSuperAssetValidate()
+        {
+            var path = AssetDatabase.GetAssetPath(Selection.activeObject);
+            if (!string.IsNullOrEmpty(path))
+            {
+                return AssetDatabase.LoadAssetAtPath<SuperAsset>(path) != null;
+            }
+
+            return false;
+        }
+
+        [MenuItem("Assets/SuperTiled2Unity/Export ST2U Asset...")]
+        private static void ExportSuperAsset()
+        {
+            var path = AssetDatabase.GetAssetPath(Selection.activeObject);
+            var tracker = new RecursiveAssetDependencyTracker(path);
+            SuperPackageExport.ShowWindow(Path.GetFileNameWithoutExtension(path), tracker.Dependencies);
+        }
+
+        [MenuItem("Assets/SuperTiled2Unity/Apply Default Settings to ST2U Assets")]
+        private static void ReimportWithDefaults()
+        {
+            UnityEngine.Object[] selectedAsset = Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.DeepAssets);
+            HashSet<TiledAssetImporter> tiledImporters = new HashSet<TiledAssetImporter>();
+
+            foreach (var obj in selectedAsset)
+            {
+                var path = AssetDatabase.GetAssetPath(obj);
+                var importer = AssetImporter.GetAtPath(path) as TiledAssetImporter;
+                if (importer != null)
+                {
+                    tiledImporters.Add(importer);
+                }
+            }
+
+            foreach (var importer in tiledImporters)
+            {
+                importer.ApplyDefaultSettings();
+            }
+
+            foreach (var importer in tiledImporters)
+            {
+                importer.SaveAndReimport();
+            }
         }
 
         // This is only invoked by a deployment batch file

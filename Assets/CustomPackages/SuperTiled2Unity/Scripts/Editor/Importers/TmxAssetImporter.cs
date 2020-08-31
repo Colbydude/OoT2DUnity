@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Xml;
 using System.Xml.Linq;
-using SuperTiled2Unity;
 using UnityEditor;
 using UnityEditor.Experimental.AssetImporters;
 using UnityEngine;
@@ -51,6 +48,14 @@ namespace SuperTiled2Unity.Editor
             XDocument doc = XDocument.Load(assetPath);
             if (doc != null)
             {
+                // Early out if Zstd compression is used. This simply isn't supported by Unity.
+                if (doc.Descendants("data").Where(x => ((string)x.Attribute("compression")) == "zstd").Count() > 0)
+                {
+                    ReportError("Unity does not support Zstandard compression.");
+                    ReportError("Select a different 'Tile Layer Format' in your map settings in Tiled and resave.");
+                    return;
+                }
+
                 var xMap = doc.Element("map");
                 ProcessMap(xMap);
             }
@@ -81,8 +86,12 @@ namespace SuperTiled2Unity.Editor
                 // Custom properties need to be in place before we process the map layers
                 AddSuperCustomProperties(m_MapComponent.gameObject, xMap.Element("properties"));
 
-                // Add layers to our grid object
-                ProcessMapLayers(m_GridComponent.gameObject, xMap);
+                using (SuperImportContext.BeginIsTriggerOverride(m_MapComponent.gameObject))
+                {
+                    // Add layers to our grid object
+                    ProcessMapLayers(m_GridComponent.gameObject, xMap);
+                    PostProccessMapLayers(m_GridComponent.gameObject);
+                }
             }
         }
 
@@ -133,27 +142,20 @@ namespace SuperTiled2Unity.Editor
             var goGrid = new GameObject("Grid");
             goGrid.transform.SetParent(m_MapComponent.gameObject.transform);
 
-            // The grid is added to the asset because without it we get prefab modifications for all collision geometry and tile matrices
-            // Note: this is crashing Unity 2018.3. Unfortunately prefab instances will be fatter in those versions of Unity. :(
-#if UNITY_2019_1_OR_NEWER
-            SuperImportContext.AddObjectToAsset("_grid", goGrid);
-#endif
-
             m_GridComponent = goGrid.AddComponent<Grid>();
-
 
             // Grid cell size always has a z-value of 1 so that we can use custom axis sorting
             float sx = SuperImportContext.MakeScalar(m_MapComponent.m_TileWidth);
             float sy = SuperImportContext.MakeScalar(m_MapComponent.m_TileHeight);
             m_GridComponent.cellSize = new Vector3(sx, sy, 1);
-            var localPosition = new Vector3(0, 0, 0);
+            Vector3 tilemapOffset = new Vector3(0, 0, 0);
 
             switch (m_MapComponent.m_Orientation)
             {
 #if UNITY_2018_3_OR_NEWER
                 case MapOrientation.Isometric:
                     m_GridComponent.cellLayout = GridLayout.CellLayout.Isometric;
-                    localPosition = new Vector3(0, -sy, 0);
+                    tilemapOffset = new Vector3(-sx * 0.5f, -sy, 0);
                     break;
 
                 case MapOrientation.Staggered:
@@ -163,22 +165,26 @@ namespace SuperTiled2Unity.Editor
                     {
                         if (m_MapComponent.m_StaggerIndex == StaggerIndex.Odd)
                         {
-                            localPosition = new Vector3(sx * 0.5f, -sy, 0);
+                            // Y - Odd
+                            tilemapOffset = new Vector3(0, -sy, 0);
                         }
                         else
                         {
-                            localPosition = new Vector3(sx, -sy, 0);
+                            // Y-Even
+                            tilemapOffset = new Vector3(sx * 0.5f, -sy, 0);
                         }
                     }
                     else if (m_MapComponent.m_StaggerAxis == StaggerAxis.X)
                     {
+                        // X-Ood
                         if (m_MapComponent.m_StaggerIndex == StaggerIndex.Odd)
                         {
-                            localPosition = new Vector3(sx * 0.5f, -sy, 0);
+                            tilemapOffset = new Vector3(0, -sy, 0);
                         }
                         else
                         {
-                            localPosition = new Vector3(sx * 0.5f, -sy * 1.5f, 0);
+                            // X-Even
+                            tilemapOffset = new Vector3(0, -sy * 1.5f, 0);
                         }
                     }
                     break;
@@ -192,11 +198,13 @@ namespace SuperTiled2Unity.Editor
 
                         if (m_MapComponent.m_StaggerIndex == StaggerIndex.Odd)
                         {
-                            localPosition = new Vector3(sx * 0.5f, sy * -0.5f, 0);
+                            // Y-Odd
+                            tilemapOffset = new Vector3(0, -sy, 0);
                         }
                         else
                         {
-                            localPosition = new Vector3(sx * 0.5f, sy * 0.25f, 0);
+                            // Y-Even
+                            tilemapOffset = new Vector3(0, -sy * 0.25f, 0);
                         }
                     }
                     else if (m_MapComponent.m_StaggerAxis == StaggerAxis.X)
@@ -208,22 +216,24 @@ namespace SuperTiled2Unity.Editor
 
                         if (m_MapComponent.m_StaggerIndex == StaggerIndex.Odd)
                         {
-                            localPosition = new Vector3(sx * -0.25f, -sy, 0);
+                            // X-Odd
+                            tilemapOffset = new Vector3(-sx * 0.75f, -sy * 1.5f, 0);
                         }
                         else
                         {
-                            localPosition = new Vector3(sx * 0.5f, -sy, 0);
+                            // X-Even
+                            tilemapOffset = new Vector3(0, -sy * 1.5f, 0);
                         }
                     }
                     break;
 #endif
                 default:
                     m_GridComponent.cellLayout = GridLayout.CellLayout.Rectangle;
-                    localPosition = new Vector3(0, -sy, 0);
+                    tilemapOffset = new Vector3(0, -sy, 0);
                     break;
             }
 
-            m_GridComponent.transform.localPosition = localPosition;
+            SuperImportContext.TilemapOffset = tilemapOffset;
 
             return true;
         }
@@ -272,6 +282,12 @@ namespace SuperTiled2Unity.Editor
             }
             else
             {
+                // Warn the user of mismatching pixels per units
+                if (PixelsPerUnit != tileset.m_PixelsPerUnit)
+                {
+                    ReportWarning("Pixels Per Unit mismatch between map ({0}) and tileset '{1}' ({2})", PixelsPerUnit, source, tileset.m_PixelsPerUnit);
+                }
+
                 if (tileset.m_HasErrors)
                 {
                     ReportError("Errors detected in tileset '{0}'. Check the tileset inspector for more details. Your map may be broken until these are fixed.", source);
@@ -321,22 +337,45 @@ namespace SuperTiled2Unity.Editor
                     continue;
                 }
 
-                if (xNode.Name == "layer")
+                LayerIgnoreMode ignoreMode = xNode.GetPropertyAttributeAs(StringConstants.Unity_Ignore, SuperImportContext.LayerIgnoreMode);
+                if (ignoreMode == LayerIgnoreMode.True)
                 {
-                    ProcessTileLayer(goParent, xNode);
+                    continue;
                 }
-                else if (xNode.Name == "group")
+
+                using (SuperImportContext.BeginLayerIgnoreMode(ignoreMode))
                 {
-                    ProcessGroupLayer(goParent, xNode);
+                    if (xNode.Name == "layer")
+                    {
+                        ProcessTileLayer(goParent, xNode);
+                    }
+                    else if (xNode.Name == "group")
+                    {
+                        ProcessGroupLayer(goParent, xNode);
+                    }
+                    else if (xNode.Name == "objectgroup")
+                    {
+                        ProcessObjectLayer(goParent, xNode);
+                    }
+                    else if (xNode.Name == "imagelayer")
+                    {
+                        ProcessImageLayer(goParent, xNode);
+                    }
                 }
-                else if (xNode.Name == "objectgroup")
-                {
-                    ProcessObjectLayer(goParent, xNode);
-                }
-                else if (xNode.Name == "imagelayer")
-                {
-                    ProcessImageLayer(goParent, xNode);
-                }
+            }
+        }
+
+        private void PostProccessMapLayers(GameObject goParent)
+        {
+            foreach (var layer in goParent.GetComponentsInChildren<SuperLayer>())
+            {
+                layer.SetWorldPosition(m_MapComponent, SuperImportContext);
+            }
+
+            // Refresh all our tilemaps so that needless prefab instance changes don't appear
+            foreach (var tilemap in goParent.GetComponentsInChildren<Tilemap>())
+            {
+                tilemap.RefreshAllTiles();
             }
         }
 
@@ -383,7 +422,7 @@ namespace SuperTiled2Unity.Editor
         {
             if (!string.IsNullOrEmpty(m_CustomImporterClassName))
             {
-                var type = Type.GetType(m_CustomImporterClassName);
+                var type = AppDomain.CurrentDomain.GetTypeFromName(m_CustomImporterClassName);
 
                 if (type == null)
                 {
@@ -425,9 +464,15 @@ namespace SuperTiled2Unity.Editor
 
                 customImporter.TmxAssetImported(args);
             }
+            catch (CustomImporterException cie)
+            {
+                ReportError("Custom Importer error: \n  Importer: {0}\n  Message: {1}", customImporter.GetType().Name, cie.Message);
+                Debug.LogErrorFormat("Custom Importer ({0}) exception: {1}", customImporter.GetType().Name, cie.Message);
+            }
             catch (Exception e)
             {
                 ReportError("Custom importer '{0}' threw an exception. Message = '{1}', Stack:\n{2}", customImporter.GetType().Name, e.Message, e.StackTrace);
+                Debug.LogErrorFormat("Custom importer general exception: {0}", e.Message);
             }
         }
     }
