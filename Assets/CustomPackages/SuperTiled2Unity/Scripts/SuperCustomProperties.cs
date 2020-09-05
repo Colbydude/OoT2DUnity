@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace SuperTiled2Unity
@@ -15,6 +12,14 @@ namespace SuperTiled2Unity
         public bool TryGetCustomProperty(string name, out CustomProperty property)
         {
             return m_Properties.TryGetProperty(name, out property);
+        }
+
+        public void RemoveCustomProperty(string name) {
+            m_Properties.RemoveAll(PredicateRemoveCustomProperty);
+
+            bool PredicateRemoveCustomProperty(CustomProperty customProperty) {
+                return name.Equals(customProperty.m_Name);
+            }
         }
     }
 }

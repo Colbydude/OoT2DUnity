@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 using SuperTiled2Unity.Editor.Geometry;
 
 namespace SuperTiled2Unity.Editor
@@ -34,7 +30,7 @@ namespace SuperTiled2Unity.Editor
             var addedCollider = go.GetComponent<Collider2D>();
             if (addedCollider != null)
             {
-                addedCollider.isTrigger = collision.m_IsTrigger;
+                addedCollider.isTrigger = importContext.GetIsTriggerOverridable(collision.m_IsTrigger);
             }
 
             goParent.AddChildWithUniqueName(go);
@@ -53,7 +49,7 @@ namespace SuperTiled2Unity.Editor
             var composition = new ComposeConvexPolygons();
             var convexPolygons = composition.Compose(triangles);
 
-            PolygonUtils.AddCompositePolygonCollider(go, convexPolygons);
+            PolygonUtils.AddCompositePolygonCollider(go, convexPolygons, importContext);
         }
 
         private static void AddEdgeCollider(GameObject go, CollisionObject collision, SuperTile tile, SuperImportContext importContext)

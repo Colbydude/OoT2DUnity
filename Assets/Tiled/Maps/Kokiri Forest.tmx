@@ -172,6 +172,9 @@
   </data>
  </layer>
  <objectgroup id="11" name="Water">
+  <properties>
+   <property name="unity:IsTrigger" type="bool" value="true"/>
+  </properties>
   <object id="10" type="Water" x="-32" y="-320">
    <polygon points="0,0 -16,16 -16,112 176,112 160,96 160,16 144,0"/>
   </object>

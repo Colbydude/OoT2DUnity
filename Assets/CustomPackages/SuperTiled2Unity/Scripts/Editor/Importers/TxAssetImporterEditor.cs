@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 using UnityEditor;
-using UnityEditor.Experimental.AssetImporters;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SuperTiled2Unity.Editor
 {
@@ -43,6 +37,8 @@ namespace SuperTiled2Unity.Editor
                 XElement xml = XElement.Parse(objectTemplate.m_ObjectXml);
                 InspectorGUIForXmlElement(xml);
             }
+
+            ApplyRevertGUI();
         }
 
         private void InspectorGUIForXmlElement(XElement xml)

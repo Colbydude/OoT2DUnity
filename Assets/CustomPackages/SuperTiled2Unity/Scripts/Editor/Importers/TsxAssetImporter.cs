@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Xml;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Tilemaps;
-using UnityEditor;
 using UnityEditor.Experimental.AssetImporters;
 
 namespace SuperTiled2Unity.Editor
@@ -43,7 +35,7 @@ namespace SuperTiled2Unity.Editor
 
         private void ImportTsxFile()
         {
-            XDocument doc = XDocument.Load(this.assetPath);
+            XDocument doc = XDocument.Load(assetPath);
             var xTileset = doc.Element("tileset");
             ProcessTileset(xTileset);
         }
@@ -51,21 +43,22 @@ namespace SuperTiled2Unity.Editor
         private void ProcessTileset(XElement xTileset)
         {
             CreateTileset(xTileset);
-            Assert.IsNotNull(this.Tileset);
+            Assert.IsNotNull(Tileset);
         }
 
         private void CreateTileset(XElement xTileset)
         {
-            Assert.IsNull(this.Tileset);
+            Assert.IsNull(Tileset);
 
             var icon = SuperIcons.GetTsxIcon();
 
             Tileset = ScriptableObject.CreateInstance<SuperTileset>();
             Tileset.m_IsInternal = false;
+            Tileset.m_PixelsPerUnit = PixelsPerUnit;
             SuperImportContext.AddObjectToAsset("_TilesetScriptObject", Tileset, icon);
-            SuperImportContext.SetMainObject(this.Tileset);
+            SuperImportContext.SetMainObject(Tileset);
 
-            var loader = new TilesetLoader(this.Tileset, this, m_UseSpriteAtlas, (int)m_AtlasWidth, (int)m_AtlasHeight);
+            var loader = new TilesetLoader(Tileset, this, m_UseSpriteAtlas, (int)m_AtlasWidth, (int)m_AtlasHeight);
             loader.LoadFromXml(xTileset);
         }
     }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Xml;
 using UnityEditor;
 using UnityEditor.Experimental.AssetImporters;
@@ -95,11 +94,6 @@ namespace SuperTiled2Unity.Editor
 #else
             ReportUnityVersionError();
 #endif
-        }
-
-        public void AddAssetPathDependency(string assetPath)
-        {
-            m_SuperAsset.AddDependency(AssetImportContext, assetPath);
         }
 
         public T RequestAssetAtPath<T>(string path) where T : UnityEngine.Object
