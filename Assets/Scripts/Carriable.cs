@@ -5,44 +5,45 @@ using UnityEngine;
 [RequireComponent(typeof(SpriteRenderer))]
 public class Carriable : MonoBehaviour
 {
-    public Vector2 carryOffset;
+    [SerializeField] protected Vector2 _carryOffset;
+    [SerializeField] protected float _throwSpeed = 36;
 
-    public Collider2D Collider2D { get { return m_Collider2D; } }
-    public SpriteRenderer SpriteRenderer { get { return m_SpriteRenderer; } }
+    private float _airTime = 0f;
+    private bool _hasBeenThrown;
+    private float _throwOffset = 0;
 
-    protected Collider2D m_Collider2D;
-    protected Rigidbody2D m_Rigidbody2D;
-    protected SpriteRenderer m_SpriteRenderer;
+    protected Collider2D _collider;
+    protected Rigidbody2D _rigidbody;
+    protected SpriteRenderer _renderer;
 
-    private float airTime = 0f;
-    private bool hasBeenThrown;
-    private float throwOffset = 0;
+    public Vector2 CarryOffset => _carryOffset;
+    public Collider2D Collider => _collider;
+    public SpriteRenderer Renderer => _renderer;
 
-    void Awake()
+    protected void Awake()
     {
-        m_Collider2D = GetComponent<Collider2D>();
-        m_Rigidbody2D = GetComponent<Rigidbody2D>();
-        m_SpriteRenderer = GetComponent<SpriteRenderer>();
+        _collider = GetComponent<Collider2D>();
+        _rigidbody = GetComponent<Rigidbody2D>();
+        _renderer = GetComponent<SpriteRenderer>();
     }
 
-    void FixedUpdate()
+    protected void FixedUpdate()
     {
-        if (hasBeenThrown) {
+        if (_hasBeenThrown)
+        {
             // Have the object "drop" towards the ground while it's in mid-air.
-            m_Rigidbody2D.position = m_Rigidbody2D.position - new Vector2(0, Mathf.Lerp(0, 1, throwOffset));
+            _rigidbody.position = _rigidbody.position - new Vector2(0, Mathf.Lerp(0, 1, _throwOffset));
 
-            // @TODO Fix magic numbers.
-            if (transform.forward.normalized.y == -1) {
-                throwOffset += 0.25f * Time.deltaTime;
-            } else {
-                throwOffset += 1f * Time.deltaTime;
-            }
+            // @TODO: Fix magic numbers.
+            if (transform.forward.normalized.y == -1)
+                _throwOffset += 0.25f * Time.deltaTime;
+            else
+                _throwOffset += 1f * Time.deltaTime;
 
-            airTime += 3.5f * Time.deltaTime;
+            _airTime += 3.5f * Time.deltaTime;
 
-            if (airTime >= 1.0f) {
+            if (_airTime >= 1.0f)
                 Destroy(this.gameObject);
-            }
         }
     }
 
@@ -51,7 +52,7 @@ public class Carriable : MonoBehaviour
     /// </summary>
     public void Drop()
     {
-        hasBeenThrown = true;
+        _hasBeenThrown = true;
     }
 
     /// <summary>
@@ -59,19 +60,14 @@ public class Carriable : MonoBehaviour
     /// </summary>
     /// <param name="direction">Direction the object is thrown in.</param>
     /// <param name="speed">Speed the object will travel at.</param>
-    public void Throw(int direction, float speed)
+    public void Throw(Direction direction)
     {
-        m_Rigidbody2D.bodyType = RigidbodyType2D.Dynamic;
-        m_Rigidbody2D.constraints = RigidbodyConstraints2D.FreezeRotation;
+        _rigidbody.bodyType = RigidbodyType2D.Dynamic;
+        _rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
 
-        switch (direction) {
-            case Constants.Direction.Right: SetVelocity(new Vector2(1, 0), speed);  break;
-            case Constants.Direction.Up:    SetVelocity(new Vector2(0, 1), speed);  break;
-            case Constants.Direction.Left:  SetVelocity(new Vector2(-1, 0), speed); break;
-            default:                        SetVelocity(new Vector2(0, -1), speed); break;
-        }
+        SetVelocity(direction.ToVector2(), _throwSpeed);
 
-        hasBeenThrown = true;
+        _hasBeenThrown = true;
     }
 
     /// <summary>
@@ -81,17 +77,16 @@ public class Carriable : MonoBehaviour
     /// <param name="speed">Speed the object will travel at.</param>
     private void SetVelocity(Vector2 velocityVector, float speed)
     {
-        m_Rigidbody2D.velocity = velocityVector * speed;
+        _rigidbody.velocity = velocityVector * speed;
     }
 
     /// <summary>
     /// Destroys the object when it collides after being thrown.
     /// </summary>
     /// <param name="collision">Collision2D data about the collision that just occurred.</param>
-    void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (hasBeenThrown) {
+        if (_hasBeenThrown)
             Destroy(this.gameObject);
-        }
     }
 }

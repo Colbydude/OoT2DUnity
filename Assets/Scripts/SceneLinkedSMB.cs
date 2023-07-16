@@ -1,31 +1,42 @@
 using UnityEngine;
 using UnityEngine.Animations;
 
+public abstract class SealedSMB : StateMachineBehaviour
+{
+    public sealed override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) { }
+    public sealed override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) { }
+    public sealed override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) { }
+}
+
+/// <summary>
+/// This class replaces the normal StateMachineBehaviour. It adds the possibility of
+/// having a direct reference to the object the state is running on, avoiding the
+/// cost of retrieving it through a GetComponent every time.
+/// </summary>
 public class SceneLinkedSMB<TMonoBehaviour> : SealedSMB where TMonoBehaviour : MonoBehaviour
 {
-    protected TMonoBehaviour m_MonoBehaviour;
+    protected TMonoBehaviour _monoBehaviour;
 
-    private bool firstFrameHappened;
-    private bool lastFrameHappened;
+    private bool _firstFrameHappened;
+    private bool _lastFrameHappened;
 
     public static void Initialise(Animator animator, TMonoBehaviour monoBehaviour)
     {
         SceneLinkedSMB<TMonoBehaviour>[] sceneLinkedSMBs = animator.GetBehaviours<SceneLinkedSMB<TMonoBehaviour>>();
 
-        for (int i = 0; i < sceneLinkedSMBs.Length; i++) {
+        for (int i = 0; i < sceneLinkedSMBs.Length; i++)
             sceneLinkedSMBs[i].InternalInitialise(animator, monoBehaviour);
-        }
     }
 
     protected void InternalInitialise(Animator animator, TMonoBehaviour monoBehaviour)
     {
-        m_MonoBehaviour = monoBehaviour;
+        _monoBehaviour = monoBehaviour;
         OnStart(animator);
     }
 
     public sealed override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller)
     {
-        firstFrameHappened = false;
+        _firstFrameHappened = false;
 
         OnSLStateEnter(animator, stateInfo, layerIndex);
         OnSLStateEnter(animator, stateInfo, layerIndex, controller);
@@ -33,35 +44,39 @@ public class SceneLinkedSMB<TMonoBehaviour> : SealedSMB where TMonoBehaviour : M
 
     public sealed override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller)
     {
-        if (!animator.gameObject.activeSelf) {
+        if (!animator.gameObject.activeSelf)
             return;
-        }
 
-        if (animator.IsInTransition(layerIndex) && animator.GetNextAnimatorStateInfo(layerIndex).fullPathHash == stateInfo.fullPathHash) {
+        if (animator.IsInTransition(layerIndex) && animator.GetNextAnimatorStateInfo(layerIndex).fullPathHash == stateInfo.fullPathHash)
+        {
             OnSLTransitionToStateUpdate(animator, stateInfo, layerIndex);
             OnSLTransitionToStateUpdate(animator, stateInfo, layerIndex, controller);
         }
 
-        if (!animator.IsInTransition(layerIndex) && firstFrameHappened) {
+        if (!animator.IsInTransition(layerIndex) && _firstFrameHappened)
+        {
             OnSLStateNoTransitionUpdate(animator, stateInfo, layerIndex);
             OnSLStateNoTransitionUpdate(animator, stateInfo, layerIndex, controller);
         }
 
-        if (animator.IsInTransition(layerIndex) && !lastFrameHappened && firstFrameHappened) {
-            lastFrameHappened = true;
+        if (animator.IsInTransition(layerIndex) && !_lastFrameHappened && _firstFrameHappened)
+        {
+            _lastFrameHappened = true;
 
             OnSLStatePreExit(animator, stateInfo, layerIndex);
             OnSLStatePreExit(animator, stateInfo, layerIndex, controller);
         }
 
-        if (!animator.IsInTransition(layerIndex) && !firstFrameHappened) {
-            firstFrameHappened = true;
+        if (!animator.IsInTransition(layerIndex) && !_firstFrameHappened)
+        {
+            _firstFrameHappened = true;
 
             OnSLStatePostEnter(animator, stateInfo, layerIndex);
             OnSLStatePostEnter(animator, stateInfo, layerIndex, controller);
         }
 
-        if (animator.IsInTransition(layerIndex) && animator.GetCurrentAnimatorStateInfo(layerIndex).fullPathHash == stateInfo.fullPathHash) {
+        if (animator.IsInTransition(layerIndex) && animator.GetCurrentAnimatorStateInfo(layerIndex).fullPathHash == stateInfo.fullPathHash)
+        {
             OnSLTransitionFromStateUpdate(animator, stateInfo, layerIndex);
             OnSLTransitionFromStateUpdate(animator, stateInfo, layerIndex, controller);
         }
@@ -69,7 +84,7 @@ public class SceneLinkedSMB<TMonoBehaviour> : SealedSMB where TMonoBehaviour : M
 
     public sealed override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller)
     {
-        lastFrameHappened = false;
+        _lastFrameHappened = false;
 
         OnSLStateExit(animator, stateInfo, layerIndex);
         OnSLStateExit(animator, stateInfo, layerIndex, controller);
@@ -149,14 +164,4 @@ public class SceneLinkedSMB<TMonoBehaviour> : SealedSMB where TMonoBehaviour : M
     /// Called after Updates when execution of the state first finshes (after transition from the state).
     /// </summary>
     public virtual void OnSLStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex, AnimatorControllerPlayable controller) { }
-}
-
-// This class replaces the normal StateMachineBehaviour. It adds the possibility of
-// having a direct reference to the object the state is running on, avoiding the
-// cost of retrieving it through a GetComponent every time.
-public abstract class SealedSMB : StateMachineBehaviour
-{
-    public sealed override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {}
-    public sealed override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {}
-    public sealed override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex){}
 }

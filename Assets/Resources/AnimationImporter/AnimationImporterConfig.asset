@@ -14,9 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animationNamesThatDoNotLoop:
   - death
-  _automaticImporting: 1
+  _automaticImporting: 0
   _spritePixelsPerUnit: 8
+  _pivotAlignmentType: 0
   _targetObjectType: 0
+  _pathToSpriteRendererComponent: 
+  _pathToImageComponent: 
   _spriteAlignment: 0
   _spriteAlignmentCustomX: 0
   _spriteAlignmentCustomY: 0
@@ -29,3 +32,4 @@ MonoBehaviour:
   _animationControllersTargetLocation:
     _locationType: 2
     _globalDirectory: Assets/Sprites/Animations
+  _spriteNamingScheme: 0
