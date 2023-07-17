@@ -7,8 +7,8 @@ public static class AnimatorExtensions
     /// </summary>
     public static void SetFacing(this Animator animator, float x, float y)
     {
-        animator.SetFloat("FaceX", x);
-        animator.SetFloat("FaceY", y);
+        animator.SetFloat(ActorAnimatorHashes.FaceX, x);
+        animator.SetFloat(ActorAnimatorHashes.FaceY, y);
     }
 
     /// <summary>

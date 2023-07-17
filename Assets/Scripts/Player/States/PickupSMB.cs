@@ -8,7 +8,9 @@ public class PickupSMB : SceneLinkedSMB<PlayerController>
 
     public override void OnSLStatePostEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        _monoBehaviour.SetMoveVector(new Vector2(0, 0));
+        _monoBehaviour.EnableSwordUse(false);
+        _monoBehaviour.LockMovement();
+        _monoBehaviour.StopMoving();
 
         _target = _monoBehaviour.Carrier.Target;
         _target.Collider.enabled = false;
@@ -25,7 +27,7 @@ public class PickupSMB : SceneLinkedSMB<PlayerController>
     {
         // Lerp towards the carry position while animating.
         // The object will then "snap" to the carry position in the next state.
-        // @TODO: Update to just update the Player's CarryPosition with the animation instead of manually lerping.
+        // @TODO?: Update to just update the Player's CarryPosition with the animation instead of manually lerping.
         if (_target != null)
             _target.transform.position = Vector2.Lerp(_startPosition, _carryPosition, 0.5f);
     }
@@ -33,5 +35,8 @@ public class PickupSMB : SceneLinkedSMB<PlayerController>
     public override void OnSLStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         _monoBehaviour.Carrier.Carry(_target);
+
+        _monoBehaviour.EnableSwordUse();
+        _monoBehaviour.LockMovement(false);
     }
 }

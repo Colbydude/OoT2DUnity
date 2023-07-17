@@ -4,7 +4,15 @@ public class RollSMB : SceneLinkedSMB<PlayerController>
 {
     public override void OnSLStatePostEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        Vector2 directionVector = _monoBehaviour.Direction.ToVector2();
-        _monoBehaviour.SetMoveVector(new Vector2(directionVector.x * _monoBehaviour.RollSpeed, directionVector.y * _monoBehaviour.RollSpeed));
+        _monoBehaviour.EnableSwordUse(false);
+        _monoBehaviour.LockMovement();
+
+        _monoBehaviour.SetMoveVector(_monoBehaviour.Direction.ToVector2() * _monoBehaviour.RollSpeed);
+    }
+
+    public override void OnSLStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        _monoBehaviour.EnableSwordUse();
+        _monoBehaviour.LockMovement(false);
     }
 }

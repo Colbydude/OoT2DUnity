@@ -1,4 +1,7 @@
-﻿public enum Direction
+﻿/// <summary>
+/// Direction in radians. Used for Actor facing and movement.
+/// </summary>
+public enum Direction
 {
     Right = 0,
     Up = 90,
@@ -6,7 +9,10 @@
     Down = 270,
 }
 
-public enum Layers
+/// <summary>
+/// Unity layers.
+/// </summary>
+public enum Layer
 {
     Default = 0,
     TransparentFX = 1,
@@ -19,4 +25,32 @@ public enum Layers
     Ground = 11,
     PlayerWeapon = 12,
     ThrownObjects = 13,
+}
+
+/// <summary>
+/// Actions that the player can take. Changes context of the Action button.
+/// </summary>
+public enum PlayerAction
+{
+    None,
+    Attack, // Roll
+    Check,
+    Climb,
+    Decide,
+    Dive,
+    Down,
+    Drop,
+    Enter,
+    Faster,
+    Grab,
+    Jump,
+    Navi, // Unused
+    Next,
+    Open,
+    PutAway,
+    Reel,
+    Save,
+    Speak,
+    Stop,
+    Throw,
 }

@@ -1,9 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 
-[RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(Carrier))]
-[RequireComponent(typeof(Rigidbody2D))]
-public class PlayerController : MonoBehaviour
+[RequireComponent(typeof(PlayerInputReader))]
+public class PlayerController : Actor
 {
     [SerializeField] private float _moveSpeed = 12f;
     [SerializeField] private float _rollSpeed = 24f;
@@ -11,95 +10,128 @@ public class PlayerController : MonoBehaviour
     [SerializeField] ShadowController _shadow;
     [SerializeField] SwordController _sword;
 
-    private int _direction = 270;
-    private Vector2 _moveVector;
-    private bool _moving;
+    private PlayerAction _action = PlayerAction.None;
+    private bool _canUseSword = true;
+    private bool _isMovementLocked = false;
 
-    private Animator _animator;
-    private Carrier _carrier;
-    private Rigidbody2D _rigidbody;
-
-    public Carrier Carrier => _carrier;
-    public Direction Direction => (Direction)_direction;
     public float MoveSpeed => _moveSpeed;
-    public Vector2 MoveVector => _moveVector;
     public float RollSpeed => _rollSpeed;
     public ShadowController Shadow => _shadow;
     public SwordController Sword => _sword;
 
-    void Awake()
+    public Carrier Carrier { get; private set; }
+    public PlayerInputReader Input { get; private set; }
+
+    protected override void Awake()
     {
-        _animator = GetComponent<Animator>();
-        _carrier = GetComponent<Carrier>();
-        _rigidbody = GetComponent<Rigidbody2D>();
+        base.Awake();
+
+        Carrier = GetComponent<Carrier>();
+        Input = GetComponent<PlayerInputReader>();
     }
 
-    void Start()
+    private void OnEnable()
     {
-        SceneLinkedSMB<PlayerController>.Initialise(_animator, this);
+        Input.ActionPerformed += Input_ActionPerformed;
+        Input.SwordPerformed += Input_SwordPerformed;
     }
 
-    void FixedUpdate()
+    private void OnDisable()
     {
-        Move(_moveVector);
+        Input.ActionPerformed -= Input_ActionPerformed;
+        Input.SwordPerformed -= Input_SwordPerformed;
     }
 
-    void OnTriggerEnter2D(Collider2D collision)
+    private void Start()
     {
-        if (collision.gameObject.layer == (int)Layers.Water)
-            _animator.Play("Swim");
+        SceneLinkedSMB<PlayerController>.Initialise(Animator, this);
     }
 
-    void OnTriggerExit2D(Collider2D collision)
+    protected override void FixedUpdate()
     {
-        if (collision.gameObject.layer == (int)Layers.Water)
-            _animator.Play("Normal");
+        _action = CalculateContextAction();
+        CalculateMoveDirection();
+
+        base.FixedUpdate();
     }
 
-    public void CheckForPickup()
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        // If a "carryable" object is in front of the player.
-        // Press action button to pick it up.
-        if (!_moving && _carrier.Target != null && Input.GetButtonDown("Action"))
-            _animator.Play("Pickup");
+        if (collision.gameObject.layer == (int)Layer.Water)
+            Animator.Play(PlayerAnimatorHashes.Swim);
     }
 
-    public void CheckForRoll()
+    private void OnTriggerExit2D(Collider2D collision)
     {
-        if (_moving && Input.GetButtonDown("Action"))
-            _animator.Play("Roll");
-    }
-
-    public void CheckForSword()
-    {
-        if (Input.GetButtonDown("Sword"))
-        {
-            _animator.Play("Sword", -1, 0f);
-            _sword.Swing();
-        }
-    }
-
-    public void CheckForThrow()
-    {
-        if (Input.GetButtonDown("Action"))
-            _animator.Play("Throw");
+        if (collision.gameObject.layer == (int)Layer.Water)
+            Animator.Play(PlayerAnimatorHashes.Normal);
     }
 
     /// <summary>
-    /// Primary movement input logic.
+    /// Enable or disable the use of the sword.
     /// </summary>
-    public void Movement()
+    public void EnableSwordUse(bool canUse = true)
     {
+        _canUseSword = canUse;
+    }
+
+    /// <summary>
+    /// Prevents the player's input from influencing movement.
+    /// </summary>
+    public void LockMovement(bool locked = true)
+    {
+        _isMovementLocked = locked;
+    }
+
+    /// <summary>
+    /// Set the actor's animator to display the sprite based on direction and moving.
+    /// Cascades down to the Sword.
+    /// </summary>
+    protected override void FaceMoveDirection()
+    {
+        base.FaceMoveDirection();
+
+        Sword.Animator.SetFacing(_direction.ToVector2());
+    }
+
+    /// <summary>
+    /// Determine the action that the player can take when pressing the Action button.
+    /// </summary>
+    private PlayerAction CalculateContextAction()
+    {
+        int currentState = Animator.GetCurrentAnimatorStateInfo(0).shortNameHash;
+
+        if (currentState == PlayerAnimatorHashes.Normal)
+        {
+            if (!_isMoving && Carrier.Target != null)
+                return PlayerAction.Grab;
+            else if (_isMoving)
+                return PlayerAction.Attack;
+        }
+        else if (currentState == PlayerAnimatorHashes.Carry)
+            return PlayerAction.Throw;
+
+        return PlayerAction.None;
+    }
+
+    /// <summary>
+    /// Change movement and direction based on input.
+    /// </summary>
+    private void CalculateMoveDirection()
+    {
+        if (_isMovementLocked)
+            return;
+
         int holdL, holdR, holdU, holdD;
         float speed;
 
-        _moveVector = Vector2.zero;
+        SetMoveVector(Vector2.zero);
 
         // Get actual key/joystick/button presses for each direction.
-        holdL = Input.GetAxisRaw("Horizontal") == -1 ? 1 : 0;
-        holdR = Input.GetAxisRaw("Horizontal") == 1 ? 1 : 0;
-        holdU = Input.GetAxisRaw("Vertical") == 1 ? 1 : 0;
-        holdD = Input.GetAxisRaw("Vertical") == -1 ? 1 : 0;
+        holdL = Input.MoveComposite.x == -1 ? 1 : 0;
+        holdR = Input.MoveComposite.x == 1 ? 1 : 0;
+        holdU = Input.MoveComposite.y == 1 ? 1 : 0;
+        holdD = Input.MoveComposite.y == -1 ? 1 : 0;
 
         // Cancel opposing keys.
         if (holdL == 1 && holdR == 1)
@@ -121,81 +153,60 @@ public class PlayerController : MonoBehaviour
             speed = _moveSpeed;
 
         // Set movement vector.
-        _moveVector = new Vector2((holdR - holdL) * speed, (holdU - holdD) * speed);
+        SetMoveVector(new Vector2((holdR - holdL) * speed, (holdU - holdD) * speed));
 
         // Determine if moving and set direction.
         switch (holdL + holdR + holdU + holdD)
         {
             // Not moving.
             case 0:
-                _moving = false;
+                _isMoving = false;
                 break;
             // Moving.
             case 1:
-                _moving = true;
-                _direction = ((int)Direction.Left) * holdL +
+                _isMoving = true;
+                _directionAngle = ((int)Direction.Left) * holdL +
                             ((int)Direction.Up) * holdU +
                             ((int)Direction.Down) * holdD;
                 break;
             default:
-                _moving = true;
-
-                switch ((Direction)_direction)
+                switch ((Direction)_directionAngle)
                 {
-                    case Direction.Left: if (holdR == 1) { _direction = (int)Direction.Right; } break;
-                    case Direction.Right: if (holdL == 1) { _direction = (int)Direction.Left; } break;
-                    case Direction.Up: if (holdD == 1) { _direction = (int)Direction.Down; } break;
-                    default: if (holdU == 1) { _direction = (int)Direction.Up; } break;
+                    case Direction.Left: if (holdR == 1) { _directionAngle = (int)Direction.Right; } break;
+                    case Direction.Right: if (holdL == 1) { _directionAngle = (int)Direction.Left; } break;
+                    case Direction.Up: if (holdD == 1) { _directionAngle = (int)Direction.Down; } break;
+                    default: if (holdU == 1) { _directionAngle = (int)Direction.Up; } break;
                 }
                 break;
         }
     }
 
-    /// <summary>
-    /// Manually set the movement vector.
-    /// </summary>
-    /// <param name="newMoveVector">The movement vector to set.</param>
-    public void SetMoveVector(Vector2 newMoveVector)
-    {
-        _moveVector = newMoveVector;
+    #region Event Handlers
 
-        if (_moveVector == Vector2.zero)
+    private void Input_ActionPerformed()
+    {
+        switch (_action)
         {
-            _moving = false;
-            _animator.SetFloat("Moving", 0);
+            case PlayerAction.Attack:
+                Animator.Play(PlayerAnimatorHashes.Roll);
+                break;
+            case PlayerAction.Grab:
+                Animator.Play(PlayerAnimatorHashes.Pickup);
+                break;
+            case PlayerAction.Throw:
+                Animator.Play(PlayerAnimatorHashes.Throw);
+                break;
         }
     }
 
-    /// <summary>
-    /// Updates the Animator's moving and facing values.
-    /// </summary>
-    public void UpdateFacing()
+    private void Input_SwordPerformed()
     {
-        _animator.SetFloat("Moving", _moving ? 1 : 0);
-        Vector2 directionVector = Direction.ToVector2();
+        if (!_canUseSword)
+            return;
 
-        _animator.SetFacing(directionVector);
-        _carrier.SetDirection(Direction);
-        _sword.Animator.SetFacing(directionVector);
-
-        // Flip if facing right.
-        transform.localScale = new Vector2(
-            _direction == (int)Direction.Right ? -1 : 1,
-            transform.localScale.y
-        );
+        Animator.Play(PlayerAnimatorHashes.Sword, -1, 0f);
+        Sword.Swing();
     }
 
-    /// <summary>
-    /// Actually moves the player by the given change vector every FixedUpdate.
-    /// </summary>
-    /// <param name="change">Vector2 to move by.</param>
-    private void Move(Vector2 change)
-    {
-        if (change != Vector2.zero)
-        {
-            _rigidbody.MovePosition(
-                _rigidbody.position + change * Time.deltaTime
-            );
-        }
-    }
+    #endregion
 }
