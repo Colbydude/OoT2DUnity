@@ -1,25 +1,21 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
 public class Damageable : MonoBehaviour
 {
-    [Serializable]
-    public class DamageEvent : UnityEvent<Damager, Damageable>
-    { }
+    [SerializeField] protected int _startingHealth = 1;
+    [SerializeField] protected bool _destroyOnDeath = false;
 
-    public int startingHealth = 1;
-    public bool destroyOnDeath = false;
-    public DamageEvent OnTakeDamage;
-    public DamageEvent OnDie;
+    protected int _currentHealth;
 
-    public int CurrentHealth { get { return currentHealth; } }
+    public int CurrentHealth => _currentHealth;
 
-    private int currentHealth;
+    public UnityEvent<Damager, Damageable> DamageTaken;
+    public UnityEvent<Damager, Damageable> Died;
 
-    void OnEnable()
+    protected void Awake()
     {
-        currentHealth = startingHealth;
+        _currentHealth = _startingHealth;
     }
 
     /// <summary>
@@ -28,16 +24,16 @@ public class Damageable : MonoBehaviour
     /// <param name="damager">The object this object is being damaged by.</param>
     public void TakeDamage(Damager damager)
     {
-        currentHealth -= damager.damage;
+        _currentHealth -= damager.Damage;
 
-        OnTakeDamage.Invoke(damager, this);
+        DamageTaken?.Invoke(damager, this);
 
-        if (currentHealth <= 0) {
-            OnDie.Invoke(damager, this);
+        if (_currentHealth <= 0)
+        {
+            Died?.Invoke(damager, this);
 
-            if (destroyOnDeath) {
+            if (_destroyOnDeath)
                 Destroy(gameObject);
-            }
         }
     }
 }

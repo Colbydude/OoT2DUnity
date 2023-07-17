@@ -9,16 +9,15 @@ ScriptedImporter:
   assetBundleVariant: 
   script: {fileID: 11500000, guid: cc34d0f3dc257a442819830b408c5322, type: 3}
   missingFiles: []
-  errors:
-  - 'Missing texture asset: ../../../../../../Desktop/oot2d_fsa/graphics/xfixium/tileset_kokiri_forest.png'
+  errors: []
   warnings: []
   missingSortingLayers: []
   missingLayers: []
   missingTags: []
-  importerVersion: 9
+  importerVersion: 13
   pixelsPerUnit: 8
   edgesPerEllipse: 32
-  numberOfObjectsImported: 2
+  numberOfObjectsImported: 2051
   useSpriteAtlas: 1
   atlasWidth: 2048
   atlasHeight: 2048
