@@ -17,7 +17,7 @@ ScriptedImporter:
   importerVersion: 13
   pixelsPerUnit: 8
   edgesPerEllipse: 32
-  numberOfObjectsImported: 2051
-  useSpriteAtlas: 1
-  atlasWidth: 2048
-  atlasHeight: 2048
+  numberOfObjectsImported: 2050
+  useSpriteAtlas: 0
+  atlasWidth: 1024
+  atlasHeight: 512
