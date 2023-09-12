@@ -476,6 +476,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 11
       objectReference: {fileID: 0}
+    - target: {fileID: -4228763342938164373, guid: 3e1616bd91747544bbed3922cbbb0379, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 25856ecbd838502408f06613e1945b58, type: 2}
     - target: {fileID: -4068474037514466509, guid: 3e1616bd91747544bbed3922cbbb0379, type: 3}
       propertyPath: m_Layer
       value: 11
@@ -1104,7 +1108,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2721278758349256735, guid: 5e4a87bb1a1b048ecb03a2a2efd1217b, type: 3}
       propertyPath: orthographic size
-      value: 9.666667
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7745051677825288788, guid: 5e4a87bb1a1b048ecb03a2a2efd1217b, type: 3}
       propertyPath: m_Name
